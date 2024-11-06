@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import sys
+from utils import *
 
 # Global variable
 seeds = []  # List to store seed positions
@@ -13,14 +14,6 @@ def preprocess_image(img, filter_size):
     img_smoothed = cv2.GaussianBlur(img_gray, (filter_size, filter_size), 0)
 
     return img_smoothed
-
-def display_image(window_name, img):
-    """
-    Display an image in a window with the given name.
-    """
-    cv2.imshow(window_name, img)
-    cv2.waitKey(0)  # Wait until a key is pressed
-    cv2.destroyAllWindows()
 
 def on_mouse_click(event, x, y, flags, param):
     """
@@ -73,18 +66,11 @@ def region_growing(image, seeds, threshold):
 
     return segmented_image
 
-# Load the RGB image
-image_path = 'images/test1.png'
-img = cv2.imread(image_path)
+# Load the road image
+img = cv2.imread('images/route.png')
 
-# Resize the image to fit the screen (e.g., 50% of the original size)
-scale_percent = 75
-width = int(img.shape[1] * scale_percent / 100)
-height = int(img.shape[0] * scale_percent / 100)
-dim = (width, height)
-
-# Resize the image
-img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+# Resize the image to fit the screen
+img = resize_image(img)
 img_display = img.copy()
 
 # Display the image to select seed points

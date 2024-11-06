@@ -1,9 +1,26 @@
 import cv2
 import numpy as np
+import sys
 
-# Global variables
+# Global variable
 seeds = []  # List to store seed positions
-threshold = 15  # Default threshold value for region growing
+
+def preprocess_image(img, filter_size):
+    """
+    Preprocess an image by converting it to grayscale and applying Gaussian smoothing.
+    """
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img_smoothed = cv2.GaussianBlur(img_gray, (filter_size, filter_size), 0)
+
+    return img_smoothed
+
+def display_image(window_name, img):
+    """
+    Display an image in a window with the given name.
+    """
+    cv2.imshow(window_name, img)
+    cv2.waitKey(0)  # Wait until a key is pressed
+    cv2.destroyAllWindows()
 
 def on_mouse_click(event, x, y, flags, param):
     """
@@ -72,22 +89,22 @@ img_display = img.copy()
 
 # Display the image to select seed points
 img_display = img.copy()
-cv2.imshow("Select Seeds", img_display)
+cv2.namedWindow("Select Seeds")
 cv2.setMouseCallback("Select Seeds", on_mouse_click)
-cv2.waitKey(0)  # Wait until a key is pressed
-cv2.destroyAllWindows()
+display_image("Select Seeds", img_display)
 
-# Convert the image to grayscale for easier intensity comparison
-gray_image = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+# Preprocess the image
+# Convert to grayscale and apply Gaussian smoothing
+img_preprocessed = preprocess_image(img, filter_size = int(sys.argv[2]))
+display_image("Preprocessed Image", img_preprocessed)
 
 # Perform region growing
-segmentation_result = region_growing(gray_image, seeds, threshold)
+threshold = int(sys.argv[1])
+segmentation_result = region_growing(img_preprocessed, seeds, threshold)
 
 # Overlay the segmentation result on the original image
 overlay = img.copy()
 overlay[segmentation_result == 255] = [255, 0, 0]  # Red color for segmented region
 
 # Display the final result
-cv2.imshow("Segmentation result", overlay)
-cv2.waitKey(0)  # Wait until a key is pressed
-cv2.destroyAllWindows()
+display_image("Segmentation Result", overlay)

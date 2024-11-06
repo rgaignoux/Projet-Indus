@@ -3,17 +3,16 @@ import numpy as np
 import sys
 from utils import *
 
-# Global variable
-seeds = []  # List to store seed positions
-
 def preprocess_image(img, filter_size):
     """
-    Preprocess an image by converting it to grayscale and applying Gaussian smoothing.
+    Preprocess an image by applying Gaussian smoothing.
     """
-    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    img_smoothed = cv2.GaussianBlur(img_gray, (filter_size, filter_size), 0)
+    img_smoothed = cv2.GaussianBlur(img, (filter_size, filter_size), 0)
 
     return img_smoothed
+
+# Global variable
+seeds = []  # List to store seed positions
 
 def on_mouse_click(event, x, y, flags, param):
     """
@@ -66,31 +65,32 @@ def region_growing(image, seeds, threshold):
 
     return segmented_image
 
-# Load the road image
-img = cv2.imread('images/route.png')
+if __name__ == "__main__":
 
-# Resize the image to fit the screen
-img = resize_image(img)
-img_display = img.copy()
+    # Load the road image
+    img = cv2.imread('images/route.png')
 
-# Display the image to select seed points
-img_display = img.copy()
-cv2.namedWindow("Select Seeds")
-cv2.setMouseCallback("Select Seeds", on_mouse_click)
-display_image("Select Seeds", img_display)
+    # Resize the image to fit the screen
+    img = resize_image(img)
+    img_display = img.copy()
 
-# Preprocess the image
-# Convert to grayscale and apply Gaussian smoothing
-img_preprocessed = preprocess_image(img, filter_size = int(sys.argv[2]))
-display_image("Preprocessed Image", img_preprocessed)
+    # Display the image to select seed points
+    img_display = img.copy()
+    cv2.namedWindow("Select Seeds")
+    cv2.setMouseCallback("Select Seeds", on_mouse_click)
+    display_image("Select Seeds", img_display)
 
-# Perform region growing
-threshold = int(sys.argv[1])
-segmentation_result = region_growing(img_preprocessed, seeds, threshold)
+    # Preprocess the image
+    img_preprocessed = preprocess_image(img, filter_size = int(sys.argv[2]))
+    display_image("Preprocessed Image", img_preprocessed)
 
-# Overlay the segmentation result on the original image
-overlay = img.copy()
-overlay[segmentation_result == 255] = [255, 0, 0]  # Red color for segmented region
+    # Perform region growing
+    threshold = int(sys.argv[1])
+    segmentation_result = region_growing(img_preprocessed, seeds, threshold)
 
-# Display the final result
-display_image("Segmentation Result", overlay)
+    # Overlay the segmentation result on the original image
+    overlay = img.copy()
+    overlay[segmentation_result == 255] = [255, 0, 0]  # Red color for segmented region
+
+    # Display the final result
+    display_image("Segmentation Result", overlay)

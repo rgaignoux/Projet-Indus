@@ -3,13 +3,25 @@ import numpy as np
 import sys
 from utils import *
 
-def preprocess_image(img, filter_size):
+def preprocess_image1(img):
     """
-    Preprocess an image by applying Gaussian smoothing.
+    Preprocess the image by converting to LAB and returning the A channel.
     """
-    img_smoothed = cv2.GaussianBlur(img, (filter_size, filter_size), 0)
+    img_lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+    channel_a = img_lab[:, :, 1]
+    
+    # Normalize
+    channel_a = cv2.normalize(channel_a, None, 0, 255, cv2.NORM_MINMAX)
 
-    return img_smoothed
+    return channel_a
+
+def preprocess_image2(img, filter_size = 5):
+    """
+    Preprocess the image by applying bilateral filtering.
+    """
+    img_preprocessed = cv2.bilateralFilter(img, filter_size, 50, 50)
+
+    return img_preprocessed
 
 # Global variable
 seeds = []  # List to store seed positions
@@ -81,7 +93,7 @@ if __name__ == "__main__":
     display_image("Select Seeds", img_display)
 
     # Preprocess the image
-    img_preprocessed = preprocess_image(img, filter_size = int(sys.argv[2]))
+    img_preprocessed = preprocess_image2(img, filter_size = int(sys.argv[2]))
     display_image("Preprocessed Image", img_preprocessed)
 
     # Perform region growing
@@ -90,7 +102,7 @@ if __name__ == "__main__":
 
     # Overlay the segmentation result on the original image
     overlay = img.copy()
-    overlay[segmentation_result == 255] = [255, 0, 0]  # Red color for segmented region
+    overlay[segmentation_result == 255] = [255, 0, 0]  # Blue color for segmented region
 
     # Display the final result
     display_image("Segmentation Result", overlay)

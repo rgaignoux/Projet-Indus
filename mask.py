@@ -29,6 +29,9 @@ def update_kernel_size(val):
 # Load the central axis image
 central_axis = cv2.imread('images/axe_central.png', cv2.IMREAD_GRAYSCALE)
 
+# Invert the image (if needed)
+central_axis = cv2.bitwise_not(central_axis)
+
 # Resize the image to fit the screen
 central_axis = resize_image(central_axis)
 display_image("Image", central_axis)
@@ -39,9 +42,10 @@ binary_bool = central_axis > 0
 # Skeletonize the image
 skeleton = morphology.skeletonize(binary_bool)
 skeleton = np.uint8(skeleton) * 255
+display_image("Skeleton", skeleton)
 
 # Load the road image
-road = cv2.imread('images/route.png', cv2.IMREAD_GRAYSCALE)
+road = cv2.imread('images/route.png')
 
 # Resize the road image to fit the screen
 road = resize_image(road)

@@ -45,9 +45,6 @@ dilated_mask = cv2.dilate(skeleton, kernel, iterations=1)
 # Apply the dilated mask to the road image
 masked_road = cv2.bitwise_and(road, road, mask=dilated_mask)
 
-# Preprocess the image
-img_preprocessed = preprocess_image2(masked_road, filter_size=5)
-
 ##########################################################
 # Second Step : Apply region growing to segment the road #
 ##########################################################

@@ -7,8 +7,6 @@ from skimage import io, morphology
 import matplotlib.pyplot as plt
 from utils import *
 
-#python test.py  threshold
-
 path_route='../Region_Growing/images/route.png'
 path_axe='../Region_Growing/images/axe_central.png'
 
@@ -80,12 +78,7 @@ def get_dominant_color_in_roadKmeans(kmeans_labels,skeleton_mask):
     return dominant_cluster
 
 
-                    ##########################################################
-                        # Generation du Mask par region growing
-                    ##########################################################
-##########################################################
-# First Step : Mask the road image with the central axis #
-##########################################################
+                   
 # Load the central axis image
 central_axis = cv2.imread(path_axe, cv2.IMREAD_GRAYSCALE)
 central_axis = resize_image(central_axis)
@@ -103,60 +96,6 @@ dilated_mask = cv2.dilate(skeleton, kernel, iterations=1)
 road = cv2.imread(path_route)
 road = resize_image(road)
 road = preprocess_image2(road, filter_size=5) # Preprocess the image
-
-# Apply the dilated mask to the road image
-masked_road = cv2.bitwise_and(road, road, mask=dilated_mask)
-
-# Preprocess the image
-img_preprocessed = preprocess_image2(masked_road, filter_size=5)
-
-##########################################################
-# Second Step : Apply region growing to segment the road #
-##########################################################
-
-# Subsample the skeleton points to get the seeds
-points = get_points_central_axis(skeleton)
-seeds = points[::5] # Subsample every 10 point
-
-# Display the seeds on the road image
-img_display = masked_road.copy()
-for seed in seeds:
-    cv2.circle(img_display, (seed[1], seed[0]), 2, (0, 255, 0), -1) # dumb column-major (col, row) format...
-display_image("Seeds", img_display)
-
-# Perform region growing
-threshold = int(sys.argv[1])
-
-#Mask
-segmented_image = region_growing(img_preprocessed, seeds, threshold)
-
-# Overlay the segmentation result on the original image
-overlay = road.copy()
-overlay[segmented_image == 255] = [255, 0, 0]  # Blue color for segmented region
-
-# Display the result
-display_image("Segmentation Result", overlay)
-
-#####################################################
-# Third Step : Post-process the segmentation result #
-#####################################################
-
-# Apply morphological closing to fill the gaps
-kernel = np.ones((7, 7), np.uint8)
-closing = cv2.morphologyEx(segmented_image, cv2.MORPH_CLOSE, kernel, iterations=3)
-display_image("Closing", closing)
-
-# Smooth the edges by applying median filter
-smoothed = cv2.medianBlur(closing, 9)
-display_image("Smoothed", smoothed)
-
-# Overlay the smoothed result on the original image
-overlay = road.copy()
-overlay[smoothed == 255] = [255, 0, 0]  # Blue color for segmented region
-display_image("Final Result", overlay)
-
-
-#smoothed est donc le mask obtenu
 
 
                     ##########################################################

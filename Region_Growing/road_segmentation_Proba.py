@@ -60,20 +60,16 @@ seeds = points[::5] # Subsample every 10 point
 img_display = masked_road.copy()
 for seed in seeds:
     cv2.circle(img_display, (seed[1], seed[0]), 2, (0, 255, 0), -1) # dumb column-major (col, row) format...
-display_image("Seeds", img_display)
+#display_image("Seeds", img_display)
 
+#Stockage des X mask
+stockage_mask=[]
 # Perform region growing
-thresholds = [2*i for i in range (15)]  # Exemple de seuils différents
+thresholds = [i for i in range (9,40)]  # Exemple de seuils différents
 
 for idx, threshold in enumerate(thresholds):
     segmented_image = region_growing(img_preprocessed, seeds, threshold)
 
-    # Overlay the segmentation result on the original image
-    #overlay = road.copy()
-    #overlay[segmented_image == 255] = [255, 0, 0]  # Blue color for segmented region
-
-    # Display the result
-    #display_image("Segmentation Result", overlay)
 
 #####################################################
 # Third Step : Post-process the segmentation result #
@@ -88,7 +84,37 @@ for idx, threshold in enumerate(thresholds):
     smoothed = cv2.medianBlur(closing, 9)
     #display_image("Smoothed", smoothed)
 
-    # Overlay the smoothed result on the original image
-    overlay = road.copy()
-    overlay[smoothed == 255] = [255, 0, 0]  # Blue color for segmented region
-    display_image("Final Result", overlay)
+    # Weight decreases as the threshold increases
+    weight = 1 / (threshold + 2)  
+
+    #A voir si on garde le smooth...
+    stockage_mask.append((smoothed,weight))
+
+# Initialiser majority_mask en fonction de la forme du premier masque
+majority_mask = np.zeros_like(stockage_mask[0][0], dtype=np.uint8)
+
+for i in range(majority_mask.shape[0]):
+    for j in range(majority_mask.shape[1]):
+        # Calculate the weighted sum for the current pixel
+        weighted_sum = 0
+        total_weight = 0
+        
+        for mask, weight in stockage_mask:
+            if mask[i, j] == 255:  # If the pixel is activated (255)
+                weighted_sum += weight  # Add weight if the pixel is activated
+            total_weight += weight  # Always add the weight of the mask, even if the pixel is not activated
+        # If the weighted sum exceeds the total weight * 0.5, activate the pixel in the majority mask
+        if total_weight > 0 and weighted_sum / total_weight > 0.5:  # Majority condition with weight
+            majority_mask[i, j] = 255  # Activate the pixel
+
+
+overlay_majority = road.copy()
+
+# Colorier les pixels actifs dans les masques pour l'overlay
+overlay_majority[majority_mask == 255] = [0, 0, 255]  # Rouge pour majorité
+
+# Affichage avec OpenCV
+cv2.imshow("Overlay Majority", overlay_majority)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows() 

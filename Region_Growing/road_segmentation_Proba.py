@@ -25,7 +25,7 @@ def get_points_central_axis(img):
 
 # Load the central axis image
 central_axis = cv2.imread('images/axe_central.png', cv2.IMREAD_GRAYSCALE)
-central_axis = resize_image(central_axis)
+central_axis = scale_image(central_axis)
 central_axis = cv2.bitwise_not(central_axis)  # Invert the image
 
 # Convert the image to a binary boolean array to skeletonize it
@@ -35,7 +35,7 @@ skeleton = np.uint8(skeleton) * 255
 
 # Load the road image
 road = cv2.imread('images/route.png')
-road = resize_image(road)
+road = scale_image(road)
 road = preprocess_image2(road, filter_size=5) # Preprocess the image
 
 # Apply dilation to the skeleton image

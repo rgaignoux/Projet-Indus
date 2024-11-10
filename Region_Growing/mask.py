@@ -33,7 +33,7 @@ central_axis = cv2.imread('images/axe_central.png', cv2.IMREAD_GRAYSCALE)
 central_axis = cv2.bitwise_not(central_axis)
 
 # Resize the image to fit the screen
-central_axis = resize_image(central_axis)
+central_axis = scale_image(central_axis)
 display_image("Image", central_axis)
 
 # Convert the image to a binary boolean array to skeletonize it
@@ -48,7 +48,7 @@ display_image("Skeleton", skeleton)
 road = cv2.imread('images/route.png')
 
 # Resize the road image to fit the screen
-road = resize_image(road)
+road = scale_image(road)
 
 # Create a slider to adjust the kernel size (between 1 and 50)
 cv2.namedWindow('Masked Road')

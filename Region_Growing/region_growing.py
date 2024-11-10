@@ -15,11 +15,11 @@ def preprocess_image1(img):
 
     return channel_a
 
-def preprocess_image2(img, filter_size = 5):
+def preprocess_image2(img, filter_size = 5, sigma = 50):
     """
     Preprocess the image by applying bilateral filtering.
     """
-    img_preprocessed = cv2.bilateralFilter(img, filter_size, 50, 50)
+    img_preprocessed = cv2.bilateralFilter(img, filter_size, sigma, sigma)
 
     return img_preprocessed
 
@@ -80,8 +80,8 @@ if __name__ == "__main__":
     # Load the road image
     img = cv2.imread('images/route.png')
 
-    # Resize the image to fit the screen
-    img = resize_image(img)
+    # Scale the image to fit the screen
+    img = scale_image(img)
     img_display = img.copy()
 
     # Display the image to select seed points

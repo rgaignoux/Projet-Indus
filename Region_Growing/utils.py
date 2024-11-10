@@ -9,9 +9,9 @@ def display_image(window_name, img):
     cv2.waitKey(0)  # Wait until a key is pressed
     cv2.destroyAllWindows()
 
-def resize_image(img, scale_percent = 65):
+def scale_image(img, scale_percent = 65):
     """
-    Resize the image by the given scale percentage.
+    Scale the image by the given scale percentage.
     """
     width = int(img.shape[1] * scale_percent / 100)
     height = int(img.shape[0] * scale_percent / 100)
@@ -19,6 +19,15 @@ def resize_image(img, scale_percent = 65):
 
     # Resize the image
     img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+    
+    return img
+
+def resize_image(img, width, height):
+    """
+    Resize the image to the given width and height.
+    """
+    dim = (width, height)
+    img = cv2.resize(img, dim, interpolation=cv2.INTER_NEAREST)
     
     return img
 

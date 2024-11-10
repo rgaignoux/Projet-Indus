@@ -24,14 +24,14 @@ def get_normal_direction(Gx, Gy, x, y):
     The direction is derived from the gradient components (Gx, Gy).
     The normal is perpendicular to the gradient.
     """
-    d1 = -Gy[x, y]  # Perpendicular to Gy (invert the vertical component)
-    d2 = Gx[x, y]   # The horizontal component stays the same
-
-    return (d1/max(abs(d1),abs(d2)), d2/max(abs(d1),abs(d2)))
+    magnitude = np.sqrt(Gx[x, y]**2 + Gy[x, y]**2)
+    d1 = Gy[x, y]/magnitude  # Perpendicular to Gy (invert the vertical component)
+    d2 = Gx[x, y]/magnitude# The horizontal component stays the same
+    return (d1, d2)
 
 
 # Load the central axis image
-central_axis = cv2.imread('images/axe2.png', cv2.IMREAD_GRAYSCALE)
+central_axis = cv2.imread('images/axe0.png', cv2.IMREAD_GRAYSCALE)
 central_axis = resize_image(central_axis)
 central_axis = cv2.bitwise_not(central_axis)  # Invert the image
 # Convert the image to a binary boolean array to skeletonize it
@@ -41,17 +41,18 @@ skeleton = np.uint8(skeleton) * 255
 cv2.imshow("Road", skeleton)
 cv2.waitKey(0)
 # Load the road image
-road = cv2.imread('images/route2.png')
+road = cv2.imread('images/route0.png')
 road=cv2.resize(road, (central_axis.shape[1], central_axis.shape[0]), interpolation=cv2.INTER_NEAREST)
-road = preprocess_image2(road, filter_size=5) # Preprocess the image
-# Convertir l'image "road" en niveaux de gris
-road_gray = cv2.cvtColor(road, cv2.COLOR_BGR2GRAY)
-# Appliquer un flou gaussien pour réduire le bruit
-blurred_road = cv2.GaussianBlur(road_gray, (3, 3), 0)
+road = cv2.bilateralFilter(road, 9, 100, 100)
+# Convertir l'image floutée de BGR à LAB
+lab_image = cv2.cvtColor(road, cv2.COLOR_BGR2LAB)
+# Séparer les canaux L, A, et B
+L, road_gray, B = cv2.split(lab_image)
+road_gray=((road_gray - road_gray.min()) / (road_gray.max() - road_gray.min()) * 255).astype(np.uint8)
+
 # Appliquer le filtre Canny pour obtenir les contours
-edges_map =cv2.Canny(blurred_road, threshold1=130, threshold2=200)
-cv2.imshow("Normal Vectors", edges_map)
-cv2.waitKey(0)
+edges_map =cv2.Canny(road_gray, 25, 125)
+display_image("Edges", edges_map)
 
 # Subsample the skeleton points to get the seeds
 points = get_points_central_axis(skeleton)
@@ -62,12 +63,13 @@ Gx = cv2.Sobel(central_axis, cv2.CV_64F, 1, 0, ksize=7)  # Gradient in x directi
 Gy = cv2.Sobel(central_axis, cv2.CV_64F, 0, 1, ksize=7)  # Gradient in y direction
 
 normals_image = np.zeros_like(central_axis) # Start with the road image to draw the normals
+#On stock la distance moyenne à l'axe ! 
+distance=0
 for seed in seeds:
     x, y = seed
     # Get the normal direction at this point
     d1, d2 = get_normal_direction(Gx, Gy, x, y)
-    print(d1,d2)
-    if(d1!=0 and d2!=0):
+    if(d1!=0 or d2!=0):
         current_x=x
         current_y=y
         # Move forward along the normal direction until we hit an edge or max distance
@@ -75,16 +77,29 @@ for seed in seeds:
             # Check if we're out of bounds
             if current_x < 0 or current_x >= Gx.shape[0] or current_y < 0 or current_y >= Gx.shape[1]:
                 break
-
-            # Check if the current point is an edge in the edges map
-            if edges_map[int(current_x), int(current_y)] > 0:
-                break  # Stop when we hit an edge
-            normals_image[int(current_x),int(current_y)]=255
+             # Check 8 connected neighbors
+            for dy in [-1, 0, 1]:
+                for dx in [-1, 0, 1]:
+                    if dy == 0 and dx == 0:
+                        continue
+                    nx, ny = current_x + dx, current_y+ dy
+                    if nx >= 0 and nx < edges_map.shape[0] and ny >= 0 and ny < edges_map.shape[1]:
+                        if(distance - (abs(x -nx) + abs(y -ny))>0):
+                            normals_image[int(nx), int(ny)] = 255
+            #les contours
+            if edges_map[int(current_x),int(current_y)] > 0:
+                print("yo")
+                if(distance !=0):
+                    current_dist= abs(x -current_x) + abs(y -current_y)
+                    if( abs(distance - current_dist)<10):
+                        normals_image[int(current_x),int(current_y)]=255
+                        distance = (current_dist + distance)/2
+                else:
+                    distance= abs(current_y -y) + abs(current_x -x)
+                    normals_image[int(current_x),int(current_y)]=255
+                break
             current_x += d1 
             current_y += d2 
-        if 0 <= current_x < normals_image.shape[0] and 0 <= current_y < normals_image.shape[1]:
-            cv2.circle(normals_image, (int(current_y), int(current_x)),1 , 255, -1)
-
 
         current_x=x
         current_y=y
@@ -92,24 +107,43 @@ for seed in seeds:
             # Check if we're out of bounds
             if current_x < 0 or current_x >= Gx.shape[0] or current_y < 0 or current_y >= Gx.shape[1]:
                 break
-
-            # Check if the current point is an edge in the edges map
-            if edges_map[int(current_x), int(current_y)] > 0:
-                break  # Stop when we hit an edge
+            # Check 8 connected neighbors
+            for dy in [-1, 0, 1]:
+                for dx in [-1, 0, 1]:
+                    if dy == 0 and dx == 0:
+                        continue
+                    nx, ny = current_x + dx, current_y+ dy
+                    if nx >= 0 and nx < edges_map.shape[0] and ny >= 0 and ny < edges_map.shape[1]:
+                        if(distance - (abs(x -nx) + abs(y -ny))>0):
+                            normals_image[int(nx), int(ny)] = 255
             normals_image[int(current_x),int(current_y)]=255
+            #les contours
+            if edges_map[int(current_x),int(current_y)] > 0:
+                if(distance !=0):
+                    current_dist= abs(x -current_x) + abs(y -current_y)
+                    if( abs(distance - current_dist)<10):
+                        normals_image[int(current_x),int(current_y)]=255
+                        distance = (current_dist + distance)/2
+                else:
+                    distance= abs(current_y -y) + abs(current_x -x)
+                    normals_image[int(current_x),int(current_y)]=255
+                break
             current_x -= d1 
             current_y -= d2 
-        if 0 <= current_x < normals_image.shape[0] and 0 <= current_y < normals_image.shape[1]:
-            cv2.circle(normals_image, (int(current_y), int(current_x)), 1, 255, -1)
     
 
+# Apply morphological closing to fill the gaps
+kernel = np.ones((3, 3), np.uint8)
+open = cv2.morphologyEx(normals_image, cv2.MORPH_OPEN, kernel, iterations=3)
 
+# Smooth the edges by applying median filter
+smoothed = cv2.medianBlur(open, 9)
 # Step 4: Show the result
-cv2.imshow("Normal Vectors", normals_image)
+cv2.imshow("Normal Vectors", smoothed)
 cv2.waitKey(0)
 
 overlay=road.copy()
-overlay[normals_image==255]=[0,0,255]
+overlay[smoothed==255]=[0,0,255]
 cv2.imshow("smoothed", overlay)
 cv2.waitKey(0)
 

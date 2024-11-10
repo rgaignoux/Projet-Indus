@@ -96,6 +96,7 @@ display_image("Edges with Central Axis", edges_copy)
 
 # Find the road edges
 road_edges = np.zeros(road.shape[:2], dtype=np.uint8)
+minmax = range(3, 15) # Min and max distances to check for edges
 
 for k in range(0, len(points)):
     # Extract k-th point of the central axis
@@ -110,12 +111,15 @@ for k in range(0, len(points)):
         norm_y = grad_y / magnitude
 
         # Check the edges in the normal direction
-        for n in range(5, 25):
+        for n in minmax:
             x2 = int(j + n * norm_x)
             y2 = int(i + n * norm_y)
 
             if x2 >= 0 and x2 < edges.shape[1] and y2 >= 0 and y2 < edges.shape[0]:
-                if edges[y2, x2] > 0:
+                if edges[y2, x2] == 0:
+                    road_edges[y2, x2] = 255
+
+                elif edges[y2, x2] > 0:
                     road_edges[y2, x2] = 255
 
                     # Check 8 connected neighbors
@@ -130,12 +134,15 @@ for k in range(0, len(points)):
                     break
 
         # Check the edges in the opposite direction
-        for n in range(5, 25):
+        for n in minmax:
             x3 = int(j - n * norm_x)
             y3 = int(i - n * norm_y)
 
             if x3 >= 0 and x3 < edges.shape[1] and y3 >= 0 and y3 < edges.shape[0]:
-                if edges[y3, x3] > 0:
+                if edges[y3, x3] == 0:
+                    road_edges[y3, x3] = 255
+
+                elif edges[y3, x3] > 0:
                     road_edges[y3, x3] = 255
 
                     # Check 8 connected neighbors

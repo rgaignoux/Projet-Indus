@@ -5,6 +5,7 @@ from utils import *
 from region_growing import *
 from skimage import io, morphology
 import matplotlib.pyplot as plt
+import time
 
 def get_points_central_axis(img):
     """
@@ -25,7 +26,7 @@ def get_points_central_axis(img):
 ##########################################################
 
 # Load the central axis image
-central_axis = cv2.imread('images/axe0.png', cv2.IMREAD_GRAYSCALE)
+central_axis = cv2.imread('images/axe4.png', cv2.IMREAD_GRAYSCALE)
 central_axis = resize_image(central_axis)
 central_axis = cv2.bitwise_not(central_axis)  # Invert the image
 
@@ -35,7 +36,7 @@ skeleton = morphology.skeletonize(binary_bool)
 skeleton = np.uint8(skeleton) * 255
 
 # Load the road image
-road = cv2.imread('images/route0.png')
+road = cv2.imread('images/route4.png')
 road=cv2.resize(road, (central_axis.shape[1], central_axis.shape[0]), interpolation=cv2.INTER_NEAREST)
 road = preprocess_image2(road, filter_size=5) # Preprocess the image
 
@@ -49,13 +50,18 @@ masked_road = cv2.bitwise_and(road, road, mask=dilated_mask)
 # Preprocess the image
 img_preprocessed = preprocess_image2(masked_road, filter_size=5)
 
+#Affichage image + axe
+overlay = road.copy()
+overlay[skeleton == 255] = [0, 255, 0]  # Blue color for segmented region
+display_image("Segmentation Result", overlay)
+
 ##########################################################
 # Second Step : Apply region growing to segment the road #
 ##########################################################
 
 # Subsample the skeleton points to get the seeds
 points = get_points_central_axis(skeleton)
-seeds = points[::5] # Subsample every 10 point
+seeds = points # Subsample every 10 point
 
 # Display the seeds on the road image
 img_display = masked_road.copy()
@@ -66,8 +72,9 @@ for seed in seeds:
 #Stockage des X mask
 stockage_mask=[]
 # Perform region growing
-thresholds = [i for i in range (9,40)]  # Exemple de seuils différents : 9,40 c'est bien pour l'image 0 !
+thresholds = [i for i in range (9,30)]  # Exemple de seuils différents : 9,40 c'est bien pour l'image 0 !
 
+start_time = time.time()
 for idx, threshold in enumerate(thresholds):
     segmented_image = region_growing(img_preprocessed, seeds, threshold)
 
@@ -77,7 +84,7 @@ for idx, threshold in enumerate(thresholds):
 #####################################################
 
     # Apply morphological closing to fill the gaps
-    kernel = np.ones((7, 7), np.uint8)
+    kernel = np.ones((5, 5), np.uint8)
     closing = cv2.morphologyEx(segmented_image, cv2.MORPH_CLOSE, kernel, iterations=3)
     #display_image("Closing", closing)
 
@@ -108,7 +115,9 @@ for i in range(majority_mask.shape[0]):
         if total_weight > 0 and weighted_sum / total_weight > 0.5:  # Majority condition with weight
             majority_mask[i, j] = 255  # Activate the pixel
 
-
+end_time = time.time()
+execution_time = end_time - start_time
+print(f"Temps d'exécution : {execution_time} secondes")
 overlay_majority = road.copy()
 
 # Colorier les pixels actifs dans les masques pour l'overlay

@@ -3,6 +3,7 @@ import numpy as np
 from utils import *
 from region_growing import *
 from skimage import io, morphology
+import time
 
 def skeletonize_image(img):
     """
@@ -49,14 +50,18 @@ def get_normal_direction(Gx, Gy, x, y):
     magnitude = np.sqrt(Gx[x, y]**2 + Gy[x, y]**2)
     
     # Perpendicular to the gradient components
-    d1 = Gy[x, y] / magnitude
-    d2 = Gx[x, y] / magnitude
+    if(magnitude!=0):
+        d1 = Gy[x, y] / magnitude
+        d2 = Gx[x, y] / magnitude
+    else:
+        d1=0
+        d2=0
     
     return (d1, d2)
 
 
 # Load and preprocess the central axis image
-central_axis = cv2.imread('images/axe0.png', cv2.IMREAD_GRAYSCALE)
+central_axis = cv2.imread('images/axe4.png', cv2.IMREAD_GRAYSCALE)
 central_axis = resize_image(central_axis)
 central_axis = cv2.bitwise_not(central_axis)  # Invert the image
 
@@ -64,7 +69,7 @@ central_axis = cv2.bitwise_not(central_axis)  # Invert the image
 skeleton, seeds  = skeletonize_image(central_axis)
 
 # Load and preprocess the road image
-road = cv2.imread('images/route0.png')
+road = cv2.imread('images/route4.png')
 road=cv2.resize(road, (central_axis.shape[1], central_axis.shape[0]), interpolation=cv2.INTER_NEAREST)
 road = cv2.bilateralFilter(road, 9, 100, 100)
 
@@ -77,7 +82,7 @@ road_gray = ((road_gray - road_gray.min()) / (road_gray.max() - road_gray.min())
 
 
 # Apply Canny edge detection
-edges_map = cv2.Canny(road_gray, 25, 125)
+edges_map = cv2.Canny(road_gray, 8, 125)
 
 # Step 1: Calculate the Sobel gradients Gx and Gy for the road lines
 Gx = cv2.Sobel(central_axis, cv2.CV_64F, 1, 0, ksize=7)  # Gradient in x direction
@@ -86,7 +91,7 @@ Gy = cv2.Sobel(central_axis, cv2.CV_64F, 0, 1, ksize=7)  # Gradient in y directi
 # Initialize an image to store the normal vectors
 normals_image = np.zeros_like(central_axis)
 distance = 0  # Initialize the average distance
-
+start_time = time.time()
 # Process each seed point to trace normals
 for seed in seeds:
     x, y = seed
@@ -158,7 +163,9 @@ opened_normals = cv2.morphologyEx(normals_image, cv2.MORPH_OPEN, kernel, iterati
 
 # Step 3: Smooth the edges using a median filter
 smoothed_normals = cv2.medianBlur(opened_normals, 9)
-
+end_time = time.time()
+execution_time = end_time - start_time
+print(f"Temps d'exécution : {execution_time} secondes")
         # --- Display Results ---
 # 1. Visualize the central axis on the road (green color)
 road_with_axis = road.copy()

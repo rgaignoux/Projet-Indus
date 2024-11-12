@@ -78,12 +78,12 @@ display_image("Segmentation Result", overlay)
 #####################################################
 
 # Apply morphological closing to fill the gaps
-kernel = np.ones((7, 7), np.uint8)
+kernel = np.ones((3, 3), np.uint8)
 closing = cv2.morphologyEx(segmented_image, cv2.MORPH_CLOSE, kernel, iterations=3)
 display_image("Closing", closing)
 
 # Smooth the edges by applying median filter
-smoothed = cv2.medianBlur(closing, 9)
+smoothed = cv2.medianBlur(closing, 5)
 display_image("Smoothed", smoothed)
 
 # Overlay the smoothed result on the original image

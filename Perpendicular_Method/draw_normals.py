@@ -2,56 +2,8 @@ import cv2
 import numpy as np
 import sys
 from skimage import morphology
-
-def display_image(window_name, img):
-    """
-    Display an image in a window with the given name.
-    """
-    cv2.imshow(window_name, img)
-    cv2.waitKey(0)  # Wait until a key is pressed
-    cv2.destroyAllWindows()
-
-def scale_image(img, scale_percent=65):
-    """
-    Scale the image by the given scale percentage.
-    """
-    width = int(img.shape[1] * scale_percent / 100)
-    height = int(img.shape[0] * scale_percent / 100)
-    dim = (width, height)
-
-    # Resize the image
-    img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
-    
-    return img
-
-def get_points_central_axis(img):
-    """
-    Get the central axis points from the skeletonized central axis image.
-    """
-    points = []
-    height, width = img.shape[:2]
-    for i in range(height):
-        for j in range(width):
-            if img[i, j] > 0:
-                points.append((i, j))
-
-    return points
-
-def skeletonize_image(img):
-    """
-    Skeletonize the given image.
-    """
-    # Convert the image to a binary boolean array to skeletonize it
-    binary_bool = img > 0
-
-    # Skeletonize the image
-    skeleton = morphology.skeletonize(binary_bool)
-    skeleton = np.uint8(skeleton) * 255
-
-    # Exract the points from the skeleton
-    points = get_points_central_axis(skeleton)
-
-    return skeleton, points
+from importlib.machinery import SourceFileLoader
+utils = SourceFileLoader('utils', './utils.py').load_module()
 
 # Load the central axis image
 central_axis = cv2.imread(sys.argv[1], cv2.IMREAD_GRAYSCALE)

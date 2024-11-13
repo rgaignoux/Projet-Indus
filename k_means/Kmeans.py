@@ -7,8 +7,8 @@ from skimage import io, morphology
 import matplotlib.pyplot as plt
 from utils import *
 
-path_route='../Region_Growing/images/route.png'
-path_axe='../Region_Growing/images/axe_central.png'
+path_route='../Region_Growing/images/route0.png'
+path_axe='../Region_Growing/images/axe0.png'
 
 def apply_iterative_opening(mask, iterations=5, kernel_size=(5, 5)):
     """
@@ -56,6 +56,7 @@ def segmentation_Kmeans_A_with_blur(image, k=2, blur_ksize=(5, 5)):
 
     # Séparer les canaux L, A, et B
     L, A, B = cv2.split(lab_image)
+    
 
     # Reshaper le canal A en une seule colonne
     A_reshaped = A.reshape((-1, 1))
@@ -94,7 +95,7 @@ dilated_mask = cv2.dilate(skeleton, kernel, iterations=1)
 
 # Load the road image
 road = cv2.imread(path_route)
-road = resize_image(road)
+road=cv2.resize(road, (central_axis.shape[1], central_axis.shape[0]), interpolation=cv2.INTER_NEAREST)
 road = preprocess_image2(road, filter_size=5) # Preprocess the image
 
 

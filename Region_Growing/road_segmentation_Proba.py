@@ -1,3 +1,9 @@
+#HS pour le moment, à revoir plus tard
+
+
+
+
+
 import cv2
 import numpy as np
 import sys
@@ -26,7 +32,7 @@ def get_points_central_axis(img):
 ##########################################################
 
 # Load the central axis image
-central_axis = cv2.imread('images/axe4.png', cv2.IMREAD_GRAYSCALE)
+central_axis = cv2.imread('images/axe0.png', cv2.IMREAD_GRAYSCALE)
 central_axis = resize_image(central_axis)
 central_axis = cv2.bitwise_not(central_axis)  # Invert the image
 
@@ -36,7 +42,7 @@ skeleton = morphology.skeletonize(binary_bool)
 skeleton = np.uint8(skeleton) * 255
 
 # Load the road image
-road = cv2.imread('images/route4.png')
+road = cv2.imread('images/route0.png')
 road=cv2.resize(road, (central_axis.shape[1], central_axis.shape[0]), interpolation=cv2.INTER_NEAREST)
 road = preprocess_image2(road, filter_size=5) # Preprocess the image
 

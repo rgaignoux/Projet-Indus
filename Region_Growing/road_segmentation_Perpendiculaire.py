@@ -61,7 +61,7 @@ def get_normal_direction(Gx, Gy, x, y):
 
 
 # Load and preprocess the central axis image
-central_axis = cv2.imread('images/axe4.png', cv2.IMREAD_GRAYSCALE)
+central_axis = cv2.imread('images/axe0.png', cv2.IMREAD_GRAYSCALE)
 central_axis = resize_image(central_axis)
 central_axis = cv2.bitwise_not(central_axis)  # Invert the image
 
@@ -69,7 +69,7 @@ central_axis = cv2.bitwise_not(central_axis)  # Invert the image
 skeleton, seeds  = skeletonize_image(central_axis)
 
 # Load and preprocess the road image
-road = cv2.imread('images/route4.png')
+road = cv2.imread('images/route0.png')
 road=cv2.resize(road, (central_axis.shape[1], central_axis.shape[0]), interpolation=cv2.INTER_NEAREST)
 road = cv2.bilateralFilter(road, 9, 100, 100)
 
@@ -79,7 +79,6 @@ L, road_gray, B = cv2.split(lab_image)
 
 # Normalize the road grayscale image
 road_gray = ((road_gray - road_gray.min()) / (road_gray.max() - road_gray.min()) * 255).astype(np.uint8)
-
 
 # Apply Canny edge detection
 edges_map = cv2.Canny(road_gray, 8, 125)

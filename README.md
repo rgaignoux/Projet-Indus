@@ -1,12 +1,12 @@
 # Usage
 ```
-python region_growing.py threshold gaussian_kernel_size
+python .\Region_Growing_Method\segmentation.py -img= -thresh= -ksize1= -ksize2=
 ```
 
 ```
-python mask.py
+python .\Region_Growing_Method\mask_slider.py
 ```
 
 ```
-python road_segmentation_RG.py threshold
+python .\Perpendicular_Method\segmentation.py -img= -min= -max=
 ```

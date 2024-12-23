@@ -4,6 +4,7 @@ import sys
 from utils import *
 from skimage import io, morphology
 import matplotlib.pyplot as plt
+import argparse  # Importation du module argparse pour le parsing des arguments
 
 def update_kernel_size(val):
     """
@@ -26,41 +27,58 @@ def update_kernel_size(val):
     # Display the result
     cv2.imshow('Masked Road', masked_road)
 
-# Load the central axis image
-central_axis = cv2.imread('images/axe_central.png', cv2.IMREAD_GRAYSCALE)
+# Parser des arguments de la ligne de commande
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Apply dilation and segmentation to road images using skeleton axis.")
+    parser.add_argument("-img", type=int, required=True, help="Image number to process (e.g., 1, 2, 3, ...)")
+    return parser.parse_args()
 
-# Invert the image (if needed)
-central_axis = cv2.bitwise_not(central_axis)
+# Main script
+if __name__ == "__main__":
+    # Parse les arguments de la ligne de commande
+    args = parse_arguments()
 
-# Resize the image to fit the screen
-central_axis = resize_image(central_axis)
-display_image("Image", central_axis)
+    # Construire les chemins des images en fonction du numéro d'image
+    image_number = args.img
+    central_axis_path = f'images/axe{image_number}.png'
+    road_image_path = f'route{image_number}.png'
 
-# Convert the image to a binary boolean array to skeletonize it
-binary_bool = central_axis > 0
 
-# Skeletonize the image
-skeleton = morphology.skeletonize(binary_bool)
-skeleton = np.uint8(skeleton) * 255
-display_image("Skeleton", skeleton)
+    # Charger l'image de l'axe central
+    central_axis = cv2.imread(central_axis_path, cv2.IMREAD_GRAYSCALE)
 
-# Load the road image
-road = cv2.imread('images/route.png')
+    # Inverser l'image (si nécessaire)
+    central_axis = cv2.bitwise_not(central_axis)
 
-# Resize the road image to fit the screen
-road = resize_image(road)
+    # Redimensionner l'image pour l'adapter à l'écran
+    central_axis = resize_image(central_axis)
+    display_image("Image", central_axis)
 
-# Create a slider to adjust the kernel size (between 1 and 50)
-cv2.namedWindow('Masked Road')
-cv2.createTrackbar('Size', 'Masked Road', 15, 50, update_kernel_size) # Initial value is 15
-update_kernel_size(15)
+    # Convertir l'image en un tableau binaire booléen pour la squelettisation
+    binary_bool = central_axis > 0
 
-# Display loop
-while True:
-    # Wait for a key press to exit
-    key = cv2.waitKey(1) & 0xFF
-    if key == 27: # Escape key
-        break
+    # Squelettiser l'image
+    skeleton = morphology.skeletonize(binary_bool)
+    skeleton = np.uint8(skeleton) * 255
+    display_image("Skeleton", skeleton)
 
-# Close all OpenCV windows
-cv2.destroyAllWindows()
+    # Charger l'image de la route
+    road = cv2.imread(road_image_path)
+
+    # Redimensionner l'image de la route
+    road = resize_image(road)
+
+    # Créer un slider pour ajuster la taille du noyau (entre 1 et 50)
+    cv2.namedWindow('Masked Road')
+    cv2.createTrackbar('Size', 'Masked Road', 15, 50, update_kernel_size) # Valeur initiale de 15
+    update_kernel_size(15)
+
+    # Boucle d'affichage
+    while True:
+        # Attendre une pression de touche pour quitter
+        key = cv2.waitKey(1) & 0xFF
+        if key == 27:  # Touche Escape
+            break
+
+    # Fermer toutes les fenêtres OpenCV
+    cv2.destroyAllWindows()

@@ -3,6 +3,7 @@ import numpy as np
 import sys
 from skimage import morphology
 
+import argparse
 def display_image(window_name, img):
     """
     Display an image in a window with the given name.
@@ -62,9 +63,23 @@ def skeletonize_image(img):
 
     return skeleton, points
 
+# Define paths to the images based on the input image number
+def get_image_paths(img_number):
+    """
+    Dynamically generate image paths based on the provided image number.
+    """
+    road_path = f'images/route{img_number}.png'
+    central_axis_path = f'images/axe{img_number}.png'
+    return road_path, central_axis_path
 
-central_axis_path = 'images/axe0.png'
-road_path = 'images/route0.png'
+parser = argparse.ArgumentParser(description="Show corners of th road")
+parser.add_argument('-img', type=int, required=True, help="Image number (e.g., 0, 1, etc.)")
+parser.add_argument('-min', type=int, default=75) # Min range for edge detection
+parser.add_argument('-max', type=int, default=125) # Max range for edge detection
+args = parser.parse_args()
+
+road_path, central_axis_path = get_image_paths(args.img)
+
 
 # Load the road image
 road = cv2.imread(road_path, cv2.IMREAD_COLOR)
@@ -86,7 +101,7 @@ skeleton, points = skeletonize_image(central_axis)
 road = cv2.bilateralFilter(road, 9, 100, 100)
 
 # Canny edge detection
-edges = cv2.Canny(road, 75, 125)
+edges = cv2.Canny(road, args.min, args.max)
 display_image("Edges", edges)
 
 # Overlay the skeleton on the edges image

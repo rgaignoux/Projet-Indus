@@ -1,8 +1,7 @@
 import cv2
-import math
 import numpy as np
 from skimage import morphology
-
+import math
 def display_image(window_name, img):
     """
     Display an image in a window with the given name.
@@ -11,9 +10,9 @@ def display_image(window_name, img):
     cv2.waitKey(0)  # Wait until a key is pressed
     cv2.destroyAllWindows()
 
-def scale_image(img, scale_percent = 65):
+def resize_image(img, scale_percent = 65):
     """
-    Scale the image by the given scale percentage.
+    Resize the image by the given scale percentage.
     """
     width = int(img.shape[1] * scale_percent / 100)
     height = int(img.shape[0] * scale_percent / 100)
@@ -23,8 +22,7 @@ def scale_image(img, scale_percent = 65):
     img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
     
     return img
-
-def resize_image(img, width, height):
+def resize_image_v2(img, width, height):
     """
     Resize the image to the given width and height.
     """
@@ -60,36 +58,19 @@ def display_images_in_one_window(window_name, images):
     cv2.waitKey(0)  # Attendre qu'une touche soit pressée
     cv2.destroyAllWindows()
 
-def overlay_mask(image, mask, bgr = True):
+def scale_image(img, scale_percent = 65):
     """
-    Overlay a mask on an image.
+    Scale the image by the given scale percentage.
     """
-    if not bgr:
-        overlay = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-    else:
-        overlay = image.copy()
-    overlay[mask > 0] = [0, 255, 0]
-    return overlay
+    width = int(img.shape[1] * scale_percent / 100)
+    height = int(img.shape[0] * scale_percent / 100)
+    dim = (width, height)
 
-def preprocess_image1(img):
-    """
-    Preprocess the image by converting to LAB and returning the A channel.
-    """
-    img_lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
-    channel_a = img_lab[:, :, 1]
+    # Resize the image
+    img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
     
-    # Normalize
-    channel_a = cv2.normalize(channel_a, None, 0, 255, cv2.NORM_MINMAX)
+    return img
 
-    return channel_a
-
-def preprocess_image2(img, filter_size = 5, sigma = 50):
-    """
-    Preprocess the image by applying bilateral filtering.
-    """
-    img_preprocessed = cv2.bilateralFilter(img, filter_size, sigma, sigma)
-
-    return img_preprocessed
 
 def skeletonize_image(img):
     """
@@ -107,6 +88,7 @@ def skeletonize_image(img):
 
     return skeleton, points
 
+
 def get_points_central_axis(img):
     """
     Get the central axis points from the skeletonized central axis image.
@@ -120,8 +102,6 @@ def get_points_central_axis(img):
 
     return points
 
-def distance(p1, p2):
-    return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
 
 def sort_points(points):
     """
@@ -139,3 +119,18 @@ def sort_points(points):
         points.remove(nearest_point)
 
     return sorted_points
+
+def distance(p1, p2):
+    return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
+
+
+def overlay_mask(image, mask, bgr = True):
+    """
+    Overlay a mask on an image.
+    """
+    if not bgr:
+        overlay = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+    else:
+        overlay = image.copy()
+    overlay[mask > 0] = [0, 255, 0]
+    return overlay

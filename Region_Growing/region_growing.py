@@ -69,16 +69,23 @@ def region_growing(image, seeds, threshold):
 
                             # Check if the intensity difference is within the threshold
                             if np.linalg.norm(np.int32(neighbor_intensity) - np.int32(seed_intensity)) < threshold:
-                                
+                                  
                                 queue.append((ny, nx)) # Add the neighbor to the queue for further exploration of his neighbors
                                 segmented_image[ny, nx] = 255  # Mark as processed and part of the region
 
     return segmented_image
 
 if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python script.py <threshold_value> <filter_size>")
+        sys.exit(1)
+
+    # Parsing arguments from command line
+    threshold = int(sys.argv[1])
+    filter_size = int(sys.argv[2])
 
     # Load the road image
-    img = cv2.imread('images/route.png')
+    img = cv2.imread('images/route0.png')
 
     # Resize the image to fit the screen
     img = resize_image(img)
@@ -91,11 +98,10 @@ if __name__ == "__main__":
     display_image("Select Seeds", img_display)
 
     # Preprocess the image
-    img_preprocessed = preprocess_image2(img, filter_size = int(sys.argv[2]))
+    img_preprocessed = preprocess_image2(img, filter_size)
     display_image("Preprocessed Image", img_preprocessed)
 
     # Perform region growing
-    threshold = int(sys.argv[1])
     segmentation_result = region_growing(img_preprocessed, seeds, threshold)
 
     # Overlay the segmentation result on the original image

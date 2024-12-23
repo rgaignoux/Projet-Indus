@@ -1,9 +1,9 @@
 import cv2
 import numpy as np
 from utils import *
-from region_growing import *
 from skimage import io, morphology
 import time
+import argparse
 
 def skeletonize_image(img):
     """
@@ -59,9 +59,25 @@ def get_normal_direction(Gx, Gy, x, y):
     
     return (d1, d2)
 
+# Define paths to the images based on the input image number
+def get_image_paths(img_number):
+    """
+    Dynamically generate image paths based on the provided image number.
+    """
+    road_path = f'images/route{img_number}.png'
+    central_axis_path = f'images/axe{img_number}.png'
+    return road_path, central_axis_path
+
+parser = argparse.ArgumentParser(description="Show corners of th road")
+parser.add_argument('-img', type=int, required=True, help="Image number (e.g., 0, 1, etc.)")
+parser.add_argument('-min', type=int, default=75) # Min range for edge detection
+parser.add_argument('-max', type=int, default=125) # Max range for edge detection
+args = parser.parse_args()
+
+road_path, central_axis_path = get_image_paths(args.img)
 
 # Load and preprocess the central axis image
-central_axis = cv2.imread('images/axe0.png', cv2.IMREAD_GRAYSCALE)
+central_axis = cv2.imread(central_axis_path, cv2.IMREAD_GRAYSCALE)
 central_axis = resize_image(central_axis)
 central_axis = cv2.bitwise_not(central_axis)  # Invert the image
 
@@ -69,7 +85,7 @@ central_axis = cv2.bitwise_not(central_axis)  # Invert the image
 skeleton, seeds  = skeletonize_image(central_axis)
 
 # Load and preprocess the road image
-road = cv2.imread('images/route0.png')
+road = cv2.imread(road_path)
 road=cv2.resize(road, (central_axis.shape[1], central_axis.shape[0]), interpolation=cv2.INTER_NEAREST)
 road = cv2.bilateralFilter(road, 9, 100, 100)
 
@@ -81,7 +97,7 @@ L, road_gray, B = cv2.split(lab_image)
 road_gray = ((road_gray - road_gray.min()) / (road_gray.max() - road_gray.min()) * 255).astype(np.uint8)
 
 # Apply Canny edge detection
-edges_map = cv2.Canny(road_gray, 8, 125)
+edges_map = cv2.Canny(road_gray, args.min, args.max)
 
 # Step 1: Calculate the Sobel gradients Gx and Gy for the road lines
 Gx = cv2.Sobel(central_axis, cv2.CV_64F, 1, 0, ksize=7)  # Gradient in x direction

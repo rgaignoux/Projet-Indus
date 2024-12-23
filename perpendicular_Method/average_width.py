@@ -3,7 +3,7 @@ import numpy as np
 import sys
 from importlib.machinery import SourceFileLoader
 import argparse
-utils = SourceFileLoader('utils', './utils.py').load_module()
+utils = SourceFileLoader('utils', './perpendicular_Method/utils.py').load_module()
 
 # Parse the arguments
 parser = argparse.ArgumentParser()
@@ -14,8 +14,8 @@ parser.add_argument('-max', type=int, default=15) # Max range for edge detection
 args = parser.parse_args()
 
 num_image = str(args.img)
-central_axis_path = f"BDD-7227/BDD-7227/axe{num_image}.png"
-road_path = f"BDD-7227/BDD-7227/route{num_image}.png"
+central_axis_path = f"images/axe{num_image}.png"
+road_path = f"images/route{num_image}.png"
 minmax = range(args.min, args.max) # Min and max distances to check for edges
 
 # Load the road image
@@ -24,7 +24,7 @@ road = utils.scale_image(road)
 
 # Load the central axis image
 central_axis = cv2.imread(central_axis_path, cv2.IMREAD_GRAYSCALE)
-central_axis = utils.resize_image(central_axis, road.shape[1], road.shape[0])
+central_axis = utils.resize_image_v2(central_axis, road.shape[1], road.shape[0])
 central_axis = cv2.bitwise_not(central_axis) # Invert the image
 
 # Sobel filter to compute the gradient

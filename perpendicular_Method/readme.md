@@ -13,4 +13,9 @@ python3 .\perpendicular_Method\segmentation_average.py -img= -min= -max=
 
 ## Résultat :
 
+![alt text](results/route1.png)
+![alt text](results/route2.png)
+![alt text](results/route3.png)
+![alt text](results/route4.png)
 ![alt text](results/route5.png)
+![alt text](results/route6.png)

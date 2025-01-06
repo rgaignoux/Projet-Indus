@@ -3,6 +3,7 @@ import numpy as np
 import sys
 from importlib.machinery import SourceFileLoader
 import argparse
+import math
 utils = SourceFileLoader('utils', './perpendicular_Method/utils.py').load_module()
 
 # Parse the arguments
@@ -38,15 +39,10 @@ skeleton, points = utils.skeletonize_image(central_axis)
 points = utils.sort_points(points)
 
 # Bilateral filtering
-road = cv2.bilateralFilter(road, 9, 100, 100)
+road_blurred = cv2.bilateralFilter(road, 9, 100, 100)
 
 # Canny edge detection
-edges = cv2.Canny(road, 75, 100)
-#utils.display_image("Edges", edges)
-
-# Overlay the skeleton on the edges image
-overlay1 = utils.overlay_mask(edges, skeleton, bgr = False)
-#utils.display_image("Edges with Central Axis", overlay1)
+edges = cv2.Canny(road_blurred, 75, 100)
 
 # Find the road edges using normals
 widths = []
@@ -125,56 +121,47 @@ for index, pos in enumerate(points):
     # Store the average width
     average_widths[(i, j)] = average
 
-#A OPTIMISER
-# Display the average widths
-road_copy = road.copy()
-for pos, width in average_widths.items():
-    width1=0
-    width2=0
+
+# Create the segmentation mask
+segmentation_mask = np.zeros(road.shape[:2])
+
+for pos in points:
     (i, j) = pos
+    width = int(math.floor(average_widths[pos]))
+
     grad_x = sobel_x[i, j]
     grad_y = sobel_y[i, j]
+
     if grad_x != 0 or grad_y != 0:
         # Normalize the gradient
         magnitude = np.sqrt(grad_x**2 + grad_y**2)
         norm_x = grad_x / magnitude
         norm_y = grad_y / magnitude
 
-        # Check the edges in the normal direction
-        for n in range (int(width//2)):
+        # Flag in the normal direction
+        for n in range(width // 2): 
             x2 = int(j + n * norm_x)
             y2 = int(i + n * norm_y)
-            # Check the 8-connected neighbors around the current point  PEUT ETRE A MODIFIER EN FCT DE L ALGO FINAL
-            for dy in [-1, 0, 1]:
-                for dx in [-1, 0, 1]:
-                    nx, ny = y2 + dx, x2+ dy
-                    if nx >= 0 and nx < road.shape[0] and ny >= 0 and ny < road.shape[1] and width1<width//2:
-                        road_copy[nx, ny] = [0, 255, 0]
-            width1+=1
 
-        for n in range (int(width//2)):
+            if x2 >= 0 and x2 < edges.shape[1] and y2 >= 0 and y2 < edges.shape[0]:
+                segmentation_mask[y2, x2] = 1
+
+        # Flag in the opposite direction
+        for n in range(width // 2):
             x3 = int(j - n * norm_x)
             y3 = int(i - n * norm_y)
-            for dy in [-1, 0, 1]:
-                for dx in [-1, 0, 1]:
-                    nx, ny = y3 + dx, x3+ dy
-                    if nx >= 0 and nx < road.shape[0] and ny >= 0 and ny < road.shape[1] and width2<width//2:
-                        road_copy[nx, ny] = [0, 255, 0]
-            width2+=1
 
-    
-# a faire: une fermeture 3*3
+            if x3 >= 0 and x3 < edges.shape[1] and y3 >= 0 and y3 < edges.shape[0]:
+                segmentation_mask[y3, x3] = 1
 
 
+# Post process segmentation
+kernel = np.ones((5, 5))
+segmentation_mask = cv2.morphologyEx(segmentation_mask, cv2.MORPH_CLOSE, kernel, iterations=3)
+utils.display_image("Segmentation", segmentation_mask * 255)
 
-
-utils.display_image("Average Widths", road_copy)
-        
-
-    
-
-    
-    
-
-
-
+# Overlay the segmentation on the road image
+result = road.copy()
+result[segmentation_mask == 1] = (0.4 * np.array([0, 0, 255]) + 0.6 * result[segmentation_mask == 1]).astype(np.uint8)
+utils.display_image("Result", result)
+cv2.imwrite(f"perpendicular_Method//results//route{num_image}.png", result)

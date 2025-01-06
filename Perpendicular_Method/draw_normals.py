@@ -1,17 +1,26 @@
 import cv2
 import numpy as np
 import sys
+import argparse
 from skimage import morphology
 from importlib.machinery import SourceFileLoader
 utils = SourceFileLoader('utils', './utils.py').load_module()
 
+# Parse the arguments
+parser = argparse.ArgumentParser()
+parser.add_argument('-img', type=int, default=1) # Image number (1-6)
+args = parser.parse_args()
+
+num_image = str(args.img)
+central_axis_path = f"C:\\Users\\Robin\\Documents\\Projet-Indus\\BDD-7227\\axe{num_image}.png"
+
 # Load the central axis image
-central_axis = cv2.imread(sys.argv[1], cv2.IMREAD_GRAYSCALE)
-central_axis = scale_image(central_axis)
+central_axis = cv2.imread(central_axis_path, cv2.IMREAD_GRAYSCALE)
+central_axis = utils.scale_image(central_axis)
 central_axis = cv2.bitwise_not(central_axis) # Invert the image
 
 # Skeletonize the central axis image
-skeleton, points = skeletonize_image(central_axis)
+skeleton, points = utils.skeletonize_image(central_axis)
 skeleton_copy = cv2.cvtColor(skeleton, cv2.COLOR_GRAY2BGR)
 
 # Sobel filter to compute the gradient
@@ -50,4 +59,4 @@ for k in range(0, len(points), step):
         cv2.line(skeleton_copy, (x1, y1), (x3, y3), (0, 255, 0), 2)
         
 
-display_image("Normals", skeleton_copy)
+utils.display_image("Normals", skeleton_copy)

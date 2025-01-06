@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import sys
+import math
 from importlib.machinery import SourceFileLoader
 import argparse
 utils = SourceFileLoader('utils', './utils.py').load_module()
@@ -9,11 +10,13 @@ utils = SourceFileLoader('utils', './utils.py').load_module()
 parser = argparse.ArgumentParser()
 parser.add_argument('-img', type=int, default=1) # Image number (1-6)
 parser.add_argument('-min', type=int, default=1) # Min range for edge detection
-parser.add_argument('-max', type=int, default=15) # Max range for edge detection
+parser.add_argument('-max', type=int, default=20) # Max range for edge detection
+parser.add_argument('-voisins', type=int, default=25) # Number of neighbors to consider in averaging
 
 args = parser.parse_args()
 
 num_image = str(args.img)
+voisins = args.voisins
 central_axis_path = f"C:\\Users\\Robin\\Documents\\Projet-Indus\\BDD-7227\\axe{num_image}.png"
 road_path = f"C:\\Users\\Robin\\Documents\\Projet-Indus\\BDD-7227\\route{num_image}.png"
 minmax = range(args.min, args.max) # Min and max distances to check for edges
@@ -38,10 +41,10 @@ skeleton, points = utils.skeletonize_image(central_axis)
 points = utils.sort_points(points)
 
 # Bilateral filtering
-road = cv2.bilateralFilter(road, 9, 100, 100)
+road_preprocess = cv2.bilateralFilter(road, 9, 60, 60)
 
 # Canny edge detection
-edges = cv2.Canny(road, 75, 100)
+edges = cv2.Canny(road_preprocess, 75, 125)
 utils.display_image("Edges", edges)
 
 # Overlay the skeleton on the edges image
@@ -49,7 +52,7 @@ overlay1 = utils.overlay_mask(edges, skeleton, bgr = False)
 utils.display_image("Edges with Central Axis", overlay1)
 
 # Find the road edges using normals
-widths = []
+widths  = []
 
 for k in range(0, len(points)):
     # Extract k-th point of the central axis
@@ -94,7 +97,7 @@ average_widths = {}
 
 for index, pos in enumerate(points):
     # Extract 2*k points around the current point
-    k = 15
+    k = voisins
     (i, j) = pos
     start = index - k
     end = index + k
@@ -108,41 +111,77 @@ for index, pos in enumerate(points):
         end = len(points) - 1
 
     # Compute the average width
-    widths_around = widths[start:end]
+    widths_around = np.array(widths[start:end])
     average = np.mean(widths_around)
 
     # Remove outliers using z-score method
-    z_scores = np.abs((widths_around - average) / np.std(widths_around))
-    threshold = 3
-    widths_around = [w for w, z in zip(widths_around, z_scores) if z < threshold]
+    threshold = 0.75
 
-    # Update the average width
-    if widths_around:
-        average = np.mean(widths_around)
+    if np.std(widths_around) != 0:
+        z_scores = np.abs((widths_around - average) / np.std(widths_around))
+        mask = z_scores < threshold
+        widths_around = widths_around[mask]
 
-    print(f"Average width at point {pos} is {average}")
+        # Update the average width
+        if len(widths_around) > 0:
+            average = np.mean(widths_around)
 
-    # Store the average width
+    # print(f"Average width at point {pos} is {average}")
     average_widths[(i, j)] = average
+    
 
-
-# Display the average widths
+# Display the average widths (with lines)
 road_copy = road.copy()
-for pos, width in average_widths.items():
+for pos in points:
     (i, j) = pos
-    cv2.circle(road_copy, (j, i), 3, (0, 255, 0), -1)
+    width = int(math.floor(average_widths[pos]))
 
-    kernel_size = int(width) // 2
-    if kernel_size % 2 == 0:
-        kernel_size += 1
+    grad_x = sobel_x[i, j]
+    grad_y = sobel_y[i, j]
 
-    for dx in range(-kernel_size, kernel_size + 1):
-        for dy in range(-kernel_size, kernel_size + 1):
-            if i + dy >= 0 and i + dy < road_copy.shape[0] and j + dx >= 0 and j + dx < road_copy.shape[1]:
-                road_copy[i + dy, j + dx] = [0, 255, 0]
+    if grad_x != 0 or grad_y != 0:
+        # Normalize the gradient
+        magnitude = np.sqrt(grad_x**2 + grad_y**2)
+        norm_x = grad_x / magnitude
+        norm_y = grad_y / magnitude
 
-utils.display_image("Average Widths", road_copy)
-        
+        # Drawn in the normal direction
+        for n in range(width // 2): 
+            x2 = int(j + n * norm_x)
+            y2 = int(i + n * norm_y)
+
+            if x2 >= 0 and x2 < edges.shape[1] and y2 >= 0 and y2 < edges.shape[0]:
+                road_copy[y2, x2] = (0, 165, 255)
+
+                # Check 8 neighbors
+                for x in range(-1, 2):
+                    for y in range(-1, 2):
+                        x_n = x2 + x
+                        y_n = y2 + y
+
+                        if x_n >= 0 and x_n < edges.shape[1] and y_n >= 0 and y_n < edges.shape[0]:
+                            road_copy[y_n, x_n] = (0, 165, 255)
+
+        # Draw in the opposite direction
+        for n in range(width // 2):
+            x3 = int(j - n * norm_x)
+            y3 = int(i - n * norm_y)
+
+            if x3 >= 0 and x3 < edges.shape[1] and y3 >= 0 and y3 < edges.shape[0]:
+                road_copy[y3, x3] = (0, 165, 255)
+
+                # Check 8 neighbors
+                for x in range(-1, 2):
+                    for y in range(-1, 2):
+                        x_n = x3 + x
+                        y_n = y3 + y
+
+                        if x_n >= 0 and x_n < edges.shape[1] and y_n >= 0 and y_n < edges.shape[0]:
+                            road_copy[y_n, x_n] = (0, 165, 255)
+
+
+utils.display_image("Lines", road_copy)
+cv2.imwrite(f"results//perpendicular//route{num_image}.png", road_copy)
 
     
 

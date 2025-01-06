@@ -87,4 +87,4 @@ for k in range(0, len(points)):
 # Overlay the road edges on the road image
 overlay2 = utils.overlay_mask(overlay1, road_edges)
 utils.display_image("Road Edges", overlay2)
-
+cv2.imwrite(f"results//region_growing//route{num_image}.png", road_copy)

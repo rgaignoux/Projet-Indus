@@ -8,7 +8,7 @@ import glob
 import os
 from draw_normals import extract_normals
 
-def remove_outliers(widths_around, average, threshold = 1):
+def remove_outliers(widths_around, average, threshold = 0.5):
     # Remove outliers using z-score method
     if np.std(widths_around) != 0:
         z_scores = np.abs((widths_around - average) / np.std(widths_around))
@@ -24,7 +24,7 @@ def remove_outliers(widths_around, average, threshold = 1):
 parser = argparse.ArgumentParser()
 parser.add_argument('-dir', type=str) # Directory path containing the images
 parser.add_argument('-min', type=int, default=1) # Min range for edge detection
-parser.add_argument('-max', type=int, default=30) # Max range for edge detection
+parser.add_argument('-max', type=int, default=50) # Max range for edge detection
 parser.add_argument('-display', type=int, default=0) # 0 : don't display images, 1 : display images 
 
 args = parser.parse_args()
@@ -47,10 +47,10 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
     central_axis = cv2.bitwise_not(central_axis) # Invert the image
 
     # Bilateral filtering
-    road_blurred = cv2.bilateralFilter(road, 9, 500, 500)
+    road_blurred = cv2.medianBlur(road, 9)
 
     # Canny edge detection
-    edges = cv2.Canny(road_blurred, 50, 75)
+    edges = cv2.Canny(road_blurred, 75, 100)
 
     # Find the road edges using normals
     normals, points = extract_normals(central_axis)
@@ -96,7 +96,7 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
 
     for index, pos in enumerate(points):
         # Extract 2*k points around the current point
-        k = 50
+        k = 30
         (i, j) = pos
         start = index - k
         end = index + k
@@ -112,12 +112,8 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
         # Compute the average widths
         widths1_around = widths1[start:end]
         widths2_around = widths2[start:end]
-        average1 = np.mean(widths1_around)
-        average2 = np.mean(widths2_around)
-
-        # Remove outliers
-        average1 = remove_outliers(widths1_around, average1)
-        average2 = remove_outliers(widths2_around, average2)
+        average1 = np.percentile(widths1_around, 75)
+        average2 = np.percentile(widths2_around, 75)
 
         average_widths1[(i, j)] = average1
         average_widths2[(i, j)] = average2

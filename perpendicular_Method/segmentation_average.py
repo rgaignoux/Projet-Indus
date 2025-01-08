@@ -46,8 +46,16 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
     central_axis = cv2.imread(axis_path, cv2.IMREAD_GRAYSCALE)
     central_axis = cv2.bitwise_not(central_axis) # Invert the image
 
-    # Bilateral filtering
-    road_blurred = cv2.medianBlur(road, 9)
+    # Filter out the white pixels
+    hsv_image = cv2.cvtColor(road, cv2.COLOR_BGR2HSV)
+    lower_white = np.array([0, 0, 140])
+    upper_white = np.array([180, 40, 255])
+    mask = cv2.inRange(hsv_image, lower_white, upper_white)
+    hsv_image[mask > 0] = [0, 0, 160]
+    road2 = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
+
+    # Gaussian filtering
+    road_blurred = cv2.medianBlur(road2, 9)
 
     # Canny edge detection
     edges = cv2.Canny(road_blurred, 50, 75)

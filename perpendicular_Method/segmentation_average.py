@@ -6,12 +6,25 @@ import argparse
 import math
 import glob
 import os
+from draw_normals import extract_normals
+
+def remove_outliers(widths_around, average, threshold = 1):
+    # Remove outliers using z-score method
+    if np.std(widths_around) != 0:
+        z_scores = np.abs((widths_around - average) / np.std(widths_around))
+        widths_around = [w for w, z in zip(widths_around, z_scores) if z < threshold]
+
+    # Update the average width
+    if widths_around:
+        average = np.mean(widths_around)
+
+    return average
 
 # Parse the arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('-dir', type=str) # Directory path containing the images
 parser.add_argument('-min', type=int, default=1) # Min range for edge detection
-parser.add_argument('-max', type=int, default=15) # Max range for edge detection
+parser.add_argument('-max', type=int, default=30) # Max range for edge detection
 parser.add_argument('-display', type=int, default=0) # 0 : don't display images, 1 : display images 
 
 args = parser.parse_args()
@@ -28,76 +41,62 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
 
     # Load the road image
     road = cv2.imread(road_path, cv2.IMREAD_COLOR)
-    road = utils.scale_image(road)
 
     # Load the central axis image
-    axis = cv2.imread(axis_path, cv2.IMREAD_GRAYSCALE)
-    axis = utils.resize_image_v2(axis, road.shape[1], road.shape[0])
-    axis = cv2.bitwise_not(axis) # Invert the image
-
-    # Sobel filter to compute the gradient
-    sobel_x = cv2.Sobel(axis, cv2.CV_64F, 1, 0, ksize=7)
-    sobel_y = cv2.Sobel(axis, cv2.CV_64F, 0, 1, ksize=7)
-
-    # Skeletonize the central axis image
-    skeleton, points = utils.skeletonize_image(axis)
-
-    # Sort the points
-    points = utils.sort_points(points)
+    central_axis = cv2.imread(axis_path, cv2.IMREAD_GRAYSCALE)
+    central_axis = cv2.bitwise_not(central_axis) # Invert the image
 
     # Bilateral filtering
-    road_blurred = cv2.bilateralFilter(road, 9, 100, 100)
+    road_blurred = cv2.bilateralFilter(road, 9, 500, 500)
 
     # Canny edge detection
-    edges = cv2.Canny(road_blurred, 75, 100)
+    edges = cv2.Canny(road_blurred, 50, 75)
 
     # Find the road edges using normals
-    widths = []
+    normals, points = extract_normals(central_axis)
+    widths1 = []
+    widths2 = []
 
     for k in range(0, len(points)):
         # Extract k-th point of the central axis
         (i, j) = points[k]
-        grad_x = sobel_x[i, j]
-        grad_y = sobel_y[i, j]
 
         width1 = 0
         width2 = 0
 
-        if grad_x != 0 or grad_y != 0:
-            # Normalize the gradient
-            magnitude = np.sqrt(grad_x**2 + grad_y**2)
-            norm_x = grad_x / magnitude
-            norm_y = grad_y / magnitude
+        (norm_x, norm_y) = normals[(i, j)]
+        
+        # Check the edges in the normal direction
+        for n in minmax:
+            x2 = int(j + n * norm_x)
+            y2 = int(i + n * norm_y)
 
-            # Check the edges in the normal direction
-            for n in minmax:
-                x2 = int(j + n * norm_x)
-                y2 = int(i + n * norm_y)
+            if x2 >= 0 and x2 < edges.shape[1] and y2 >= 0 and y2 < edges.shape[0]:
+                width1 += 1
+                if edges[y2, x2] > 0:
+                    break
 
-                if x2 >= 0 and x2 < edges.shape[1] and y2 >= 0 and y2 < edges.shape[0]:
-                    width1 += 1
-                    if edges[y2, x2] > 0:
-                        break
+        # Check the edges in the opposite direction
+        for n in minmax:
+            x3 = int(j - n * norm_x)
+            y3 = int(i - n * norm_y)
 
-            # Check the edges in the opposite direction
-            for n in minmax:
-                x3 = int(j - n * norm_x)
-                y3 = int(i - n * norm_y)
+            if x3 >= 0 and x3 < edges.shape[1] and y3 >= 0 and y3 < edges.shape[0]:
+                width2 += 1
+                if edges[y3, x3] > 0:
+                    break
 
-                if x3 >= 0 and x3 < edges.shape[1] and y3 >= 0 and y3 < edges.shape[0]:
-                    width2 += 1
-                    if edges[y3, x3] > 0:
-                        break
-
-        widths.append(width1 + width2)
+        widths1.append(width1)
+        widths2.append(width2)
 
 
     # Compute the average widths
-    average_widths = {}
+    average_widths1 = {}
+    average_widths2 = {}
 
     for index, pos in enumerate(points):
         # Extract 2*k points around the current point
-        k = 10
+        k = 50
         (i, j) = pos
         start = index - k
         end = index + k
@@ -110,21 +109,18 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
             start -= abs(end - len(points) + 1)
             end = len(points) - 1
 
-        # Compute the average width
-        widths_around = widths[start:end]
-        average = np.mean(widths_around)
+        # Compute the average widths
+        widths1_around = widths1[start:end]
+        widths2_around = widths2[start:end]
+        average1 = np.mean(widths1_around)
+        average2 = np.mean(widths2_around)
 
-        # Remove outliers using z-score method
-        z_scores = np.abs((widths_around - average) / np.std(widths_around))
-        threshold = 3
-        widths_around = [w for w, z in zip(widths_around, z_scores) if z < threshold]
+        # Remove outliers
+        average1 = remove_outliers(widths1_around, average1)
+        average2 = remove_outliers(widths2_around, average2)
 
-        # Update the average width
-        if widths_around:
-            average = np.mean(widths_around)
-
-        # Store the average width
-        average_widths[(i, j)] = average
+        average_widths1[(i, j)] = average1
+        average_widths2[(i, j)] = average2
 
 
     # Create the segmentation mask
@@ -132,39 +128,31 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
 
     for pos in points:
         (i, j) = pos
-        width = int(math.floor(average_widths[pos]))
+        width1 = int(math.floor(average_widths1[pos]))
+        width2 = int(math.floor(average_widths2[pos]))
 
-        grad_x = sobel_x[i, j]
-        grad_y = sobel_y[i, j]
+        (norm_x, norm_y) = normals[(i, j)]
 
-        if grad_x != 0 or grad_y != 0:
-            # Normalize the gradient
-            magnitude = np.sqrt(grad_x**2 + grad_y**2)
-            norm_x = grad_x / magnitude
-            norm_y = grad_y / magnitude
+        # Flag in the normal direction
+        for n in range(width1): 
+            x2 = int(j + n * norm_x)
+            y2 = int(i + n * norm_y)
 
-            # Flag in the normal direction
-            for n in range(width // 2): 
-                x2 = int(j + n * norm_x)
-                y2 = int(i + n * norm_y)
+            if x2 >= 0 and x2 < edges.shape[1] and y2 >= 0 and y2 < edges.shape[0]:
+                segmentation_mask[y2, x2] = 1
+            
+        # Flag in the opposite direction
+        for n in range(width2):
+            x3 = int(j - n * norm_x)
+            y3 = int(i - n * norm_y)
 
-                if x2 >= 0 and x2 < edges.shape[1] and y2 >= 0 and y2 < edges.shape[0]:
-                    segmentation_mask[y2, x2] = 1
-
-            # Flag in the opposite direction
-            for n in range(width // 2):
-                x3 = int(j - n * norm_x)
-                y3 = int(i - n * norm_y)
-
-                if x3 >= 0 and x3 < edges.shape[1] and y3 >= 0 and y3 < edges.shape[0]:
-                    segmentation_mask[y3, x3] = 1
+            if x3 >= 0 and x3 < edges.shape[1] and y3 >= 0 and y3 < edges.shape[0]:
+                segmentation_mask[y3, x3] = 1
 
 
     # Post process segmentation
-    kernel = np.ones((5, 5))
-    segmentation_mask = cv2.morphologyEx(segmentation_mask, cv2.MORPH_CLOSE, kernel)
+    segmentation_mask = cv2.morphologyEx(segmentation_mask, cv2.MORPH_CLOSE, np.ones((3, 3)), iterations=3)
     segmentation_mask = (segmentation_mask * 255).astype(np.uint8)
-    segmentation_mask = cv2.medianBlur(segmentation_mask, 5)
     filename = os.path.splitext(os.path.basename(road_path))[0]
     cv2.imwrite(f"perpendicular_Method//results//segm_{filename}.png", segmentation_mask)
     if display == 1:
@@ -172,7 +160,7 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
 
     # Overlay the segmentation on the road image
     result = road.copy()
-    result[segmentation_mask == 1] = (0.4 * np.array([0, 0, 255]) + 0.6 * result[segmentation_mask == 1]).astype(np.uint8)
-    cv2.imwrite(f"perpendicular_Method//results//overlay_{filename}.png", segmentation_mask)
+    result[segmentation_mask >= 1] = (0.4 * np.array([0, 255, 255]) + 0.6 * result[segmentation_mask >= 1]).astype(np.uint8)
+    cv2.imwrite(f"perpendicular_Method//results//overlay_{filename}.png", result)
     if display == 1:
         utils.display_image("Result", result)

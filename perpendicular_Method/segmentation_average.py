@@ -50,7 +50,7 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
     road_blurred = cv2.medianBlur(road, 9)
 
     # Canny edge detection
-    edges = cv2.Canny(road_blurred, 75, 100)
+    edges = cv2.Canny(road_blurred, 50, 75)
 
     # Find the road edges using normals
     normals, points = extract_normals(central_axis)
@@ -96,7 +96,7 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
 
     for index, pos in enumerate(points):
         # Extract 2*k points around the current point
-        k = 30
+        k = 75
         (i, j) = pos
         start = index - k
         end = index + k
@@ -112,8 +112,8 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
         # Compute the average widths
         widths1_around = widths1[start:end]
         widths2_around = widths2[start:end]
-        average1 = np.percentile(widths1_around, 75)
-        average2 = np.percentile(widths2_around, 75)
+        average1 = np.percentile(widths1_around, 50)
+        average2 = np.percentile(widths2_around, 50)
 
         average_widths1[(i, j)] = average1
         average_widths2[(i, j)] = average2

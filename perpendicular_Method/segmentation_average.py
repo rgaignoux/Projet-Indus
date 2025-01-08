@@ -24,7 +24,7 @@ def remove_outliers(widths_around, average, threshold = 0.5):
 parser = argparse.ArgumentParser()
 parser.add_argument('-dir', type=str) # Directory path containing the images
 parser.add_argument('-min', type=int, default=1) # Min range for edge detection
-parser.add_argument('-max', type=int, default=50) # Max range for edge detection
+parser.add_argument('-max', type=int, default=30) # Max range for edge detection
 parser.add_argument('-display', type=int, default=0) # 0 : don't display images, 1 : display images 
 
 args = parser.parse_args()
@@ -48,17 +48,17 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
 
     # Filter out the white pixels
     hsv_image = cv2.cvtColor(road, cv2.COLOR_BGR2HSV)
-    lower_white = np.array([0, 0, 140])
-    upper_white = np.array([180, 40, 255])
+    lower_white = np.array([0, 0, 160])
+    upper_white = np.array([180, 60, 255])
     mask = cv2.inRange(hsv_image, lower_white, upper_white)
     hsv_image[mask > 0] = [0, 0, 160]
     road2 = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
 
     # Gaussian filtering
-    road_blurred = cv2.medianBlur(road2, 9)
+    road_blurred = cv2.medianBlur(road2, 5)
 
     # Canny edge detection
-    edges = cv2.Canny(road_blurred, 50, 75)
+    edges = cv2.Canny(road_blurred, 75, 75)
 
     # Find the road edges using normals
     normals, points = extract_normals(central_axis)
@@ -118,10 +118,16 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
             end = len(points) - 1
 
         # Compute the average widths
-        widths1_around = widths1[start:end]
-        widths2_around = widths2[start:end]
-        average1 = np.percentile(widths1_around, 50)
-        average2 = np.percentile(widths2_around, 50)
+        widths1_around = []
+        widths2_around = []
+        for idx_pt in range(start, end):
+            pt = points[idx_pt]
+            if utils.distance(pt, pos) <= k:
+                widths1_around.append(widths1[idx_pt])
+                widths2_around.append(widths2[idx_pt])
+
+        average1 = np.mean(widths1_around)
+        average2 = np.mean(widths2_around)
 
         average_widths1[(i, j)] = average1
         average_widths2[(i, j)] = average2
@@ -132,8 +138,16 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
 
     for pos in points:
         (i, j) = pos
-        width1 = int(math.floor(average_widths1[pos]))
-        width2 = int(math.floor(average_widths2[pos]))
+
+        if math.isnan(average_widths1[pos]):
+            width1 = 0
+        else:
+            width1 = int(math.floor(average_widths1[pos]))
+
+        if math.isnan(average_widths2[pos]):
+            width2 = 0
+        else:
+            width2 = int(math.floor(average_widths2[pos]))
 
         (norm_x, norm_y) = normals[(i, j)]
 

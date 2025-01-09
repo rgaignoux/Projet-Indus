@@ -2,11 +2,6 @@ import numpy as np
 import cv2
 import argparse
 
-# Parse the arguments
-parser = argparse.ArgumentParser()
-parser.add_argument('-dir', type=str) # Directory path containing the images
-#On récupére la direction où sont les masks prédits et les masks vrais
-folder=parser.parse_args().dir
 
 
 def calculate_precision_recall_f1(pred_mask, true_mask):
@@ -25,9 +20,9 @@ def calculate_precision_recall_f1(pred_mask, true_mask):
     true_flat = true_mask.flatten()
 
     # calcul de TP, FP, FN
-    tp = np.sum((pred_flat == 255) & (true_flat == 255))
-    fp = np.sum((pred_flat == 255) & (true_flat == 0))
-    fn = np.sum((pred_flat == 0) & (true_flat == 255))
+    tp = np.sum((pred_flat == 1) & (true_flat == 1))
+    fp = np.sum((pred_flat == 1) & (true_flat == 0))
+    fn = np.sum((pred_flat == 0) & (true_flat == 1))
 
     # Calcul des métriques
     precision = tp / (tp + fp) if (tp + fp) > 0 else 0
@@ -69,7 +64,7 @@ def evaluate_masks(pred_masks, true_masks):
     avg_recall = np.mean(recall_list)
     avg_f1 = np.mean(f1_list)
 
-    Robin's time afficher une courbe? :( 
+    #Robin's time afficher une courbe? :( 
     return {
         "average_precision": avg_precision,
         "average_recall": avg_recall,
@@ -77,14 +72,16 @@ def evaluate_masks(pred_masks, true_masks):
     }
 
 
+folder="Metrics/toComputeMetrics/"
 
-# Example usage
-pred_mask_paths = Robin's time
-true_mask_paths = Robin's time
+# Exemple d'utilisation
+import glob
+
+pred_mask_paths = glob.glob(folder + "mask/*.png")  # Tous les fichiers masques prévus
+true_mask_paths = glob.glob(folder + "truth/*.png")  # Tous les fichiers masques vérités terrain
 
 pred_masks = [(cv2.imread(path, cv2.IMREAD_GRAYSCALE) > 127).astype(np.uint8) for path in pred_mask_paths]
 true_masks = [(cv2.imread(path, cv2.IMREAD_GRAYSCALE) > 127).astype(np.uint8) for path in true_mask_paths]
-
 results = evaluate_masks(pred_masks, true_masks)
 
 print("Evaluation Results:")

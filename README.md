@@ -20,15 +20,15 @@ python3 .\Region_Growing\mask.py -img 0
 ```
 ### Application d'un regin growing, avec selection des graines à la main
 ```bash
-python Region_Growing.py <threshold_value> <filter_size>
+python .\region_growing_Method\Region_Growing.py <threshold_value> <filter_size>
 ```
 ### Application d'un region growing, avec selection des graines automatique et random 
 ```bash
-python3 .\Region_Growing\road_segmentation_RG.py -img 0 -thresh 15
+python3 .\region_growing_Method\road_segmentation_RG.py -img 0 -thresh 15
 ```
 ### Utilisation de probabilités pour créer une segmentation
 ```bash
-python3 .\Region_Growing\road_segmentation_Proba.py
+python3 .\region_growing_Method\road_segmentation_Proba.py
 ```
 
 ## Algorithmes basé contour

@@ -6,6 +6,7 @@ Méthodologie
 Deux approches principales ont été utilisées pour la segmentation des images :
 
 U-Net
+
 DeepLabV3+
 Ces modèles sont entraînés pour segmenter les routes et trottoirs et générer des masques indiquant leurs emplacements.
 

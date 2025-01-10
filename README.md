@@ -5,8 +5,8 @@ Ce projet, proposé par l'entreprise Someware, vise à développer un modèle d'
 Méthodologie
 Deux approches principales ont été utilisées pour la segmentation des images :
 
-*U-Net
+U-Net
 
-*DeepLabV3+
+DeepLabV3+
 Ces modèles sont entraînés pour segmenter les routes et trottoirs et générer des masques indiquant leurs emplacements.
 

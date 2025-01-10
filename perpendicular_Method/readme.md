@@ -3,7 +3,9 @@
 ```
 python3 .\perpendicular_Method\segmentation_average.py -dir="your_images_directory"
 ```
-
+```
+python3 .\perpendicular_Method\segmentation_average.py -dir="images/ImagesRennes"
+```
 - Preprocessing de la route (filtre gaussien)
 - Calcul du gradient de l'axe central afin obtenir les normales en chaque point
 ![alt text](results/normales.png)

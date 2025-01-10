@@ -16,7 +16,7 @@ python3 .\k_means_Method\Fuzzy_c_means.py -img <image_number>
 ## Algorithmes basé Region Growing:
 ### affichage de l'extraction de la route
 ```bash
-python3 .\Region_Growing\mask.py -img 0
+python3 .\region_growing_Method\mask.py -img 0
 ```
 ### Application d'un regin growing, avec selection des graines à la main
 ```bash

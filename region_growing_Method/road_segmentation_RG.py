@@ -24,8 +24,8 @@ def get_image_paths(img_number):
     """
     Dynamically generate image paths based on the provided image number.
     """
-    road_path = f'images/route{img_number}.png'
-    central_axis_path = f'images/axe{img_number}.png'
+    road_path = f'images/ImagesRennes/route{img_number}.png'
+    central_axis_path = f'images/ImagesRennes/axe{img_number}.png'
     return road_path, central_axis_path
 
 # Fonction pour analyser les arguments en ligne de commande

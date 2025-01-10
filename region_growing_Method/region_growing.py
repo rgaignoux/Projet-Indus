@@ -85,7 +85,7 @@ if __name__ == "__main__":
     filter_size = int(sys.argv[2])
 
     # Load the road image
-    img = cv2.imread('images/route0.png')
+    img = cv2.imread('images/ImagesRennes/route0.png')
 
     # Resize the image to fit the screen
     img = resize_image(img)

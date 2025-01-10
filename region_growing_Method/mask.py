@@ -40,8 +40,8 @@ if __name__ == "__main__":
 
     # Construire les chemins des images en fonction du numéro d'image
     image_number = args.img
-    central_axis_path = f'images/axe{image_number}.png'
-    road_image_path = f'route{image_number}.png'
+    central_axis_path = f'images/ImagesRennes/axe{image_number}.png'
+    road_image_path = f'images/ImagesRennes/route{image_number}.png'
 
 
     # Charger l'image de l'axe central

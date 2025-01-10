@@ -1,11 +1,7 @@
 import cv2
 import numpy as np
-import sys, os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..','Region_Growing'))
-from region_growing import *
 from skimage import io, morphology
 import matplotlib.pyplot as plt
-from utils import *
 import argparse
 
 
@@ -14,12 +10,26 @@ parser = argparse.ArgumentParser(description="Segmentation and analysis of road 
 parser.add_argument('-img', type=int, required=True, help="Image number (e.g., 0, 1, etc.)")
 args = parser.parse_args()
 
+
+def resize_image(img, scale_percent = 65):
+    """
+    Resize the image by the given scale percentage.
+    """
+    width = int(img.shape[1] * scale_percent / 100)
+    height = int(img.shape[0] * scale_percent / 100)
+    dim = (width, height)
+
+    # Resize the image
+    img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+    
+    return img
+
 def get_image_paths(img_number):
     """
     Dynamically generate image paths based on the provided image number.
     """
-    central_axis_path = f'images/axe{img_number}.png'
-    road_path = f'images/route{img_number}.png'
+    central_axis_path = f'images/ImagesRennes/axe{img_number}.png'
+    road_path = f'images/ImagesRennes/route{img_number}.png'
     return road_path, central_axis_path
 
 def apply_iterative_opening(mask, iterations=5, kernel_size=(5, 5)):
@@ -95,6 +105,54 @@ def get_dominant_color_in_roadKmeans(kmeans_labels, skeleton_mask):
     dominant_cluster = np.bincount(road_pixels).argmax()
     return dominant_cluster
 
+def preprocess_image2(image, filter_size=5):
+    """
+    Preprocess the image by applying Gaussian blur.
+    
+    :param image: Input image to preprocess.
+    :param filter_size: Size of the kernel for Gaussian blur.
+    :return: Blurred image.
+    """
+    # Apply Gaussian blur to smooth the image
+    blurred_image = cv2.GaussianBlur(image, (filter_size, filter_size), 0)
+    
+    return blurred_image
+
+def display_image(window_name, img):
+    """
+    Display an image in a window with the given name.
+    """
+    cv2.imshow(window_name, img)
+    cv2.waitKey(0)  # Wait until a key is pressed
+    cv2.destroyAllWindows()
+
+def display_images_in_one_window(window_name, images):
+    """
+    Display multiple images in a single window.
+
+    :param window_name: The name of the window where images will be displayed.
+    :param images: A list of images to display.
+    """
+    # Vérifie si toutes les images ont la même hauteur
+    heights = [img.shape[0] for img in images]
+    max_height = max(heights)
+    
+    # Ajuste toutes les images à la hauteur maximale
+    resized_images = []
+    for img in images:
+        aspect_ratio = img.shape[1] / img.shape[0]  # Calcul du rapport d'aspect
+        new_width = int(max_height * aspect_ratio)  # Redimensionner pour garder le rapport d'aspect
+        resized_img = cv2.resize(img, (new_width, max_height))  # Redimensionner
+        resized_images.append(resized_img)
+    
+    # Concaténer les images horizontalement
+    combined_image = np.concatenate(resized_images, axis=1)
+
+    # Afficher l'image combinée
+    cv2.imshow(window_name, combined_image)
+    cv2.waitKey(0)  # Attendre qu'une touche soit pressée
+    cv2.destroyAllWindows()
+    
 if __name__ == "__main__":
     # Get paths for the road and central axis images
     road_path, central_axis_path = get_image_paths(args.img)

@@ -175,7 +175,7 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
     filename = os.path.splitext(os.path.basename(road_path))[0]
     cv2.imwrite(f"perpendicular_Method//results//segm_{filename}.png", segmentation_mask)
     if display == 1:
-        utils.display_image("Segmentation")
+        utils.display_image("Segmentation",segmentation_mask)
 
     # Overlay the segmentation on the road image
     result = road.copy()

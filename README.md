@@ -32,17 +32,13 @@ python3 .\region_growing_Method\road_segmentation_Proba.py
 ```
 
 ## Algorithmes basé contour
-### Affichage des contours de la route
-```bash
-.\perpendicular_Method\segmentation_corners_road.py -img 0   -min 75 -max 125
-```
 ### Affichage d'une segmentation basée sur les normales à l'axe central
 Utilisation de la distance à l'axe central et d'une largeur moyenne de la route pour tenter d'améliorer le résultat
 ```bash
- python3 .\perpendicular_Method\road_segmentation_Perpendiculaire.py -img 0 -min 75 -max 125
+ python3 ./perpendicular_Method/segmentation_normals.py -img 0 -min 75 -max 125
  ```
 
 ### Affichage d'une segmentation basée sur les normales à l'axe central + calcul de la largeur moyenne de la route en des points du contour de la route 
 ```bash
-python3 .\perpendicular_Method\average_width.py -img 5 -min 75 -max 125
+python3 .\perpendicular_Method\segmentation_average.py -dir 'images/ImagesRennes' -min 75 -max 125 -display 1
 ```

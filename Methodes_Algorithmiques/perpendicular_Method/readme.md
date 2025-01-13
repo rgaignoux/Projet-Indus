@@ -17,6 +17,8 @@ python3 .\perpendicular_Method\segmentation_average.py -dir="images/ImagesRennes
 - **Skeletonization** de l'image de l'axe central et calcul de la normal en chaque point via filtres de Sobel 5x5
 - **Postprocess** des normales (correction des directions + remplacement des outliers)
 
+![alt text](results/normales.png)
+
 3. **Calcul des longueurs en chaque point de l'axe central skeletonizé :**
 - Calcul des contours de l'image de route preprocess, via filtre de Canny
 - Les pixels sont parcourus dans la direction des **2 normales** (dans la direction de la normale + dans la direction opposée à la normale) et marqués comme étant de la route jusqu-à ce qu'un contour soit rencontré

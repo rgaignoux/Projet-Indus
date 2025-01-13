@@ -28,16 +28,13 @@ python3 .\perpendicular_Method\segmentation_average.py -dir="images/ImagesRennes
 5. **Post process de la segmentation :**
 - Fermeture 3x3
 
+## Métriques
 
-- Preprocessing de la route
-- Calcul du gradient de l'axe central afin obtenir les normales en chaque point
-![alt text](results/normales.png)
-- Création du masque de segmentation :
-    - on applique un filtre de Canny sur l'image de route pour obtenir les contours
-    - pour chaque point de l'axe central, on parcous les pixels dans la direction de la normale et on marque les pixels comme faisant partie du masque jusqu'à ce qu'on atteigne un pixel de contour
-    - on moyenne selon les largeurs voisines
+**Average Precision :** `0.8290`
+**Average Recall :** `0.8559`
+**Average F1 Score :** `0.8410`
 
-## Résultat :
+## Segmentations :
 
 ![alt text](results/overlay_route0.png)
 ![alt text](results/segm_route0.png)

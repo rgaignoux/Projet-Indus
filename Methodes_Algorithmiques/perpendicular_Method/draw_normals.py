@@ -5,13 +5,6 @@ import argparse
 import utils
 import math
 
-def angle_between_vectors(v1, v2):
-    dot_product = v1[0] * v2[0] + v1[1] * v2[1]
-    magnitude_v1 = np.sqrt(v1[0]**2 + v1[1]**2)
-    magnitude_v2 = np.sqrt(v2[0]**2 + v2[1]**2)
-    cos_theta = dot_product / (magnitude_v1 * magnitude_v2 + 1e-8)
-    return np.arccos(np.clip(cos_theta, -1, 1))
-
 def correct_normal_orientation(normals):
     for idx in range(1, len(normals)):
         _, (prev_norm_x, prev_norm_y) = normals[idx - 1]
@@ -25,6 +18,13 @@ def correct_normal_orientation(normals):
             normals[idx] = ((i, j), (-curr_norm_x, -curr_norm_y))
 
     return normals
+
+def angle_between_vectors(v1, v2):
+    dot_product = v1[0] * v2[0] + v1[1] * v2[1]
+    magnitude_v1 = np.sqrt(v1[0]**2 + v1[1]**2)
+    magnitude_v2 = np.sqrt(v2[0]**2 + v2[1]**2)
+    cos_theta = dot_product / (magnitude_v1 * magnitude_v2 + 1e-8)
+    return np.arccos(np.clip(cos_theta, -1, 1))
 
 def remove_normals_outliers(normals, angle_threshold = np.pi / 4):
 
@@ -72,6 +72,9 @@ def extract_normals(central_axis):
 
     # Compute normals
     normals = []
+    reference_normal = None  # Initial reference normal
+    update_interval = 10
+
     for k in range(0, len(points)):
         (i, j) = points[k]
         grad_x = sobel_x[i, j]
@@ -81,12 +84,22 @@ def extract_normals(central_axis):
             magnitude = np.sqrt(grad_x**2 + grad_y**2)
             norm_x = grad_x / magnitude
             norm_y = grad_y / magnitude
-            normals.append(((i, j), (norm_x, norm_y)))
+            current_normal = np.array([norm_x, norm_y])
+
+            # Check for alignment with reference normal
+            if reference_normal is not None:
+                dot_product = np.dot(reference_normal, current_normal)
+                if dot_product < 0:  # Invert the normal if it is misaligned (angle > 90°)
+                    current_normal = -current_normal
+
+            normals.append(((i, j), tuple(current_normal)))
+
+            # Update the reference normal at regular intervals
+            if k % update_interval == 0:
+                reference_normal = current_normal
+
         else:
             normals.append(((i, j), (0, 0)))
-
-    # Correct orientation if needed
-    normals = correct_normal_orientation(normals)
 
     # Remove "outliers"
     normals = remove_normals_outliers(normals)
@@ -94,7 +107,7 @@ def extract_normals(central_axis):
     # Transform to dict
     normals_dict = {key: value for key, value in normals}
 
-    return normals_dict, points
+    return normals_dict, points, skeleton
 
 if __name__ == "__main__":
     # Parse the arguments
@@ -112,7 +125,7 @@ if __name__ == "__main__":
     skeleton_rgb = cv2.cvtColor(skeleton, cv2.COLOR_GRAY2BGR)
 
     # Compute normals
-    normals, _ = extract_normals(central_axis)
+    normals, _, _ = extract_normals(central_axis)
 
     line_length = 15
     for (i, j), (norm_x, norm_y) in normals.items():

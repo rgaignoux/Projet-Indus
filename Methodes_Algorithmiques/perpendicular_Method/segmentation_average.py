@@ -8,7 +8,7 @@ import glob
 import os
 from draw_normals import extract_normals
 
-def remove_outliers(widths_around, average, threshold = 0.5):
+def remove_outliers(widths_around, average, threshold = 1.25):
     # Remove outliers using z-score method
     if np.std(widths_around) != 0:
         z_scores = np.abs((widths_around - average) / np.std(widths_around))
@@ -49,20 +49,21 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
 
     # Filter out the white pixels
     hsv_image = cv2.cvtColor(road, cv2.COLOR_BGR2HSV)
-    lower_white = np.array([0, 0, 140])
-    upper_white = np.array([180, 40, 255])
+    lower_white = np.array([0, 0, 150])
+    upper_white = np.array([180, 50, 255])
     mask = cv2.inRange(hsv_image, lower_white, upper_white)
     hsv_image[mask > 0] = [0, 0, 160]
     road2 = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
 
     # Gaussian filtering
-    road_blurred = cv2.bilateralFilter(road2, 9, 150, 150)
+    road_blurred = cv2.GaussianBlur(road2, (5,5), 0)
+    #road_blurred = cv2.bilateralFilter(road, 9, 75, 75)
 
     # Canny edge detection
-    edges = cv2.Canny(road_blurred, 100, 125)
+    edges = cv2.Canny(road_blurred, 75, 75)
 
     # Find the road edges using normals
-    normals, points = extract_normals(central_axis)
+    normals, points, _ = extract_normals(central_axis)
     widths1 = []
     widths2 = []
 
@@ -118,17 +119,30 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
             start -= abs(end - len(points) + 1)
             end = len(points) - 1
 
-        # Compute the average widths
+        # Compute the weighted average widths
         widths1_around = []
         widths2_around = []
+        weights = []  # To store weights based on distance
+
         for idx_pt in range(start, end):
             pt = points[idx_pt]
-            if utils.distance(pt, pos) <= k:
-                widths1_around.append(widths1[idx_pt])
-                widths2_around.append(widths2[idx_pt])
+            dist = utils.distance(pt, pos)
+            if dist <= k:
+                weight = np.exp(-(dist**2) / (2 * k**2))  # Gaussian weighting
+                weights.append(weight)
+                widths1_around.append(widths1[idx_pt] * weight)
+                widths2_around.append(widths2[idx_pt] * weight)
 
-        average1 = np.mean(widths1_around)
-        average2 = np.mean(widths2_around)
+        # Calculate the weighted averages
+        if weights:
+            average1 = np.sum(widths1_around) / np.sum(weights)
+            average2 = np.sum(widths2_around) / np.sum(weights)
+        else:
+            average1 = 0
+            average2 = 0
+
+        average1 = remove_outliers(widths1_around, average1)
+        average2 = remove_outliers(widths2_around, average2)
 
         average_widths1[(i, j)] = average1
         average_widths2[(i, j)] = average2
@@ -175,7 +189,7 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
     filename = os.path.splitext(os.path.basename(road_path))[0]
     cv2.imwrite(f"perpendicular_Method//results//segm_{filename}.png", segmentation_mask)
     if display == 1:
-        utils.display_image("Segmentation",segmentation_mask)
+        utils.display_image("Segmentation")
 
     # Overlay the segmentation on the road image
     result = road.copy()

@@ -29,3 +29,13 @@ Voici quelques résultats obtenus après segmentation des trottoirs et routes av
 
 ### 🖼️ Image 3
 ![Segmentation 3](https://github.com/rgaignoux/Projet-Indus/blob/Mawa/Resultats_ArcGIS_segmentation/route16_segmented.png?raw=true)
+
+
+### 🖼️ Image 4
+![Segmentation 4](https://github.com/rgaignoux/Projet-Indus/blob/Mawa/Resultats_ArcGIS_segmentation/route17_segmented.png?raw=true)
+
+### 🖼️ Image 5
+![Segmentation 5](https://github.com/rgaignoux/Projet-Indus/blob/Mawa/Resultats_ArcGIS_segmentation/route4_segmented.png?raw=true)
+
+### 🖼️ Image 6
+![Segmentation 6](https://github.com/rgaignoux/Projet-Indus/blob/Mawa/Resultats_ArcGIS_segmentation/route9_segmented.png?raw=true)

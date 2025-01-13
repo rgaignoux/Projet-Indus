@@ -32,9 +32,9 @@ python3 .\perpendicular_Method\segmentation_average.py -dir="images/ImagesRennes
 
 ## Métriques
 
-**Average Precision :** `0.8290`
-**Average Recall :** `0.8559`
-**Average F1 Score :** `0.8410`
+- **Average Precision :** `0.8290`
+- **Average Recall :** `0.8559`
+- **Average F1 Score :** `0.8410`
 
 ## Segmentations :
 

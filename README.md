@@ -19,7 +19,7 @@ Ces modèles sont entraînés pour segmenter les routes et trottoirs et génére
 
 ## 🏁 Résultats de la segmentation avec ArcGIS
 
-Voici quelques résultats obtenus après segmentation des trottoirs et routes avec ArcGIS :
+Voici quelques résultats obtenus après segmentation des routes avec ArcGIS :
 
 ### 🖼️ Image 1
 ![Segmentation 1](https://github.com/rgaignoux/Projet-Indus/blob/Mawa/Resultats_ArcGIS_segmentation/route11_segmentee.png?raw=true)

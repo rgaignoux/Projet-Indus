@@ -8,15 +8,21 @@ import glob
 import os
 from draw_normals import extract_normals
 
-def remove_outliers(widths_around, average, threshold = 1.25):
-    # Remove outliers using z-score method
-    if np.std(widths_around) != 0:
-        z_scores = np.abs((widths_around - average) / np.std(widths_around))
-        widths_around = [w for w, z in zip(widths_around, z_scores) if z < threshold]
+def remove_outliers_and_compute_mean(widths_around, lower_percentile=2, upper_percentile=98):
+    if not widths_around:
+        return 0
+        
+    lower_bound = np.percentile(widths_around, lower_percentile)
+    upper_bound = np.percentile(widths_around, upper_percentile)
+    filtered_widths = []
 
-    # Update the average width
-    if widths_around:
-        average = np.mean(widths_around)
+    for w in widths_around:
+        if lower_bound <= w <= upper_bound:
+            filtered_widths.append(w)
+
+    average = 0
+    if filtered_widths:
+        average = np.mean(filtered_widths)
 
     return average
 
@@ -24,7 +30,7 @@ def remove_outliers(widths_around, average, threshold = 1.25):
 parser = argparse.ArgumentParser()
 parser.add_argument('-dir', type=str) # Directory path containing the images
 parser.add_argument('-min', type=int, default=1) # Min range for edge detection
-parser.add_argument('-max', type=int, default=30) # Max range for edge detection
+parser.add_argument('-max', type=int, default=50) # Max range for edge detection
 parser.add_argument('-display', type=int, default=0) # 0 : don't display images, 1 : display images 
 
 args = parser.parse_args()
@@ -57,10 +63,11 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
 
     # Gaussian filtering
     road_blurred = cv2.GaussianBlur(road2, (5,5), 0)
+    road_blurred = cv2.GaussianBlur(road2, (5,5), 0)
     #road_blurred = cv2.bilateralFilter(road, 9, 75, 75)
 
     # Canny edge detection
-    edges = cv2.Canny(road_blurred, 75, 75)
+    edges = cv2.Canny(road_blurred, 100, 100)
 
     # Find the road edges using normals
     normals, points, _ = extract_normals(central_axis)
@@ -106,7 +113,7 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
 
     for index, pos in enumerate(points):
         # Extract 2*k points around the current point
-        k = 100
+        k = 125
         (i, j) = pos
         start = index - k
         end = index + k
@@ -122,27 +129,16 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
         # Compute the weighted average widths
         widths1_around = []
         widths2_around = []
-        weights = []  # To store weights based on distance
 
         for idx_pt in range(start, end):
             pt = points[idx_pt]
             dist = utils.distance(pt, pos)
             if dist <= k:
-                weight = np.exp(-(dist**2) / (2 * k**2))  # Gaussian weighting
-                weights.append(weight)
-                widths1_around.append(widths1[idx_pt] * weight)
-                widths2_around.append(widths2[idx_pt] * weight)
+                widths1_around.append(widths1[idx_pt])
+                widths2_around.append(widths2[idx_pt])
 
-        # Calculate the weighted averages
-        if weights:
-            average1 = np.sum(widths1_around) / np.sum(weights)
-            average2 = np.sum(widths2_around) / np.sum(weights)
-        else:
-            average1 = 0
-            average2 = 0
-
-        average1 = remove_outliers(widths1_around, average1)
-        average2 = remove_outliers(widths2_around, average2)
+        average1 = remove_outliers_and_compute_mean(widths1_around)
+        average2 = remove_outliers_and_compute_mean(widths2_around)
 
         average_widths1[(i, j)] = average1
         average_widths2[(i, j)] = average2

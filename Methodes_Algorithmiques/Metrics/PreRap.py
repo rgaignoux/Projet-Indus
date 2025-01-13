@@ -4,13 +4,14 @@ import argparse
 
 
 
-def calculate_precision_recall_f1(pred_mask, true_mask):
+def calculate_precision_recall_f1(pred_mask, true_mask,max_value=255):
     """
     Fonction permettant de calculer la précision, le rappel et le score F1 pour une seule paire de masques binaires.
 
     Paramétres:
         pred_mask (numpy.ndarray): mask prédit 0/1
         true_mask (numpy.ndarray): vrai mask 0/1
+        max_value (int): valeur maximale d'un pixel (le mask, 1 ou 255)
 
     Return:
         dict: un dictionnaire qui contient les 3 informations
@@ -20,9 +21,9 @@ def calculate_precision_recall_f1(pred_mask, true_mask):
     true_flat = true_mask.flatten()
 
     # calcul de TP, FP, FN
-    tp = np.sum((pred_flat == 1) & (true_flat == 1))
-    fp = np.sum((pred_flat == 1) & (true_flat == 0))
-    fn = np.sum((pred_flat == 0) & (true_flat == 1))
+    tp = np.sum((pred_flat == max_value) & (true_flat == max_value))
+    fp = np.sum((pred_flat == max_value) & (true_flat == 0))
+    fn = np.sum((pred_flat == 0) & (true_flat == max_value))
 
     # Calcul des métriques
     precision = tp / (tp + fp) if (tp + fp) > 0 else 0
@@ -35,7 +36,7 @@ def calculate_precision_recall_f1(pred_mask, true_mask):
         "f1_score": f1_score
     }
 
-def evaluate_masks(pred_masks, true_masks):
+def evaluate_masks(pred_masks, true_masks,max_value=255):
     """
     Fonction permettant de calculer la précision, le rappel et le score F1 pour une liste de masques binaires prédits et vrais.
 
@@ -54,7 +55,7 @@ def evaluate_masks(pred_masks, true_masks):
     f1_list = []
     #Parcourt des masks
     for pred_mask, true_mask in zip(pred_masks, true_masks):
-        metrics = calculate_precision_recall_f1(pred_mask, true_mask)
+        metrics = calculate_precision_recall_f1(pred_mask, true_mask,max_value)
         precision_list.append(metrics["precision"])
         recall_list.append(metrics["recall"])
         f1_list.append(metrics["f1_score"])
@@ -72,18 +73,19 @@ def evaluate_masks(pred_masks, true_masks):
     }
 
 
-folder="Metrics/toComputeMetrics/"
+folder="Methodes_algorithmiques/Metrics/toComputeMetrics/"
 
 # Exemple d'utilisation
 import glob
 
 pred_mask_paths = glob.glob(folder + "mask/*.png")  # Tous les fichiers masques prévus
 true_mask_paths = glob.glob(folder + "truth/*.png")  # Tous les fichiers masques vérités terrain
+print(pred_mask_paths)
+print(true_mask_paths)
+pred_masks = [(cv2.imread(path, cv2.IMREAD_GRAYSCALE)).astype(np.uint8) for path in pred_mask_paths]
+true_masks = [(cv2.imread(path, cv2.IMREAD_GRAYSCALE)).astype(np.uint8) for path in true_mask_paths]
 
-pred_masks = [(cv2.imread(path, cv2.IMREAD_GRAYSCALE) > 127).astype(np.uint8) for path in pred_mask_paths]
-true_masks = [(cv2.imread(path, cv2.IMREAD_GRAYSCALE) > 127).astype(np.uint8) for path in true_mask_paths]
-results = evaluate_masks(pred_masks, true_masks)
-
+results = evaluate_masks(pred_masks, true_masks,255)
 print("Evaluation Results:")
 print(f"Average Precision: {results['average_precision']:.4f}")
 print(f"Average Recall: {results['average_recall']:.4f}")

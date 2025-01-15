@@ -59,12 +59,14 @@ import math
         else:
             corrected_normals.append(((i, j), (norm_x, norm_y))) """
 
-
-def compute_average_normals(normals, neighbor_count=10):
+def compute_average_normals(normals, neighbor_count=5):
     average_normals = []
 
     for idx in range(len(normals)):
         (i, j), (norm_x, norm_y) = normals[idx]
+
+        if np.isnan(norm_x) or np.isnan(norm_y):
+            norm_x, norm_y = 0, 0
 
         # Extract the neighbor normals (10 previous and next ones)
         neighbor_normals = []
@@ -74,6 +76,10 @@ def compute_average_normals(normals, neighbor_count=10):
             neighbor_idx = idx + offset
             if 0 <= neighbor_idx < len(normals):
                 _, (neighbor_x, neighbor_y) = normals[neighbor_idx]
+
+                if np.isnan(neighbor_x) or np.isnan(neighbor_y):
+                    neighbor_x, neighbor_y = 0, 0
+
                 neighbor_normals.append((neighbor_x, neighbor_y))
 
         # Compute average normal from neighbors
@@ -82,6 +88,9 @@ def compute_average_normals(normals, neighbor_count=10):
             avg_y = np.mean([n[1] for n in neighbor_normals])
             avg_magnitude = np.sqrt(avg_x**2 + avg_y**2)
             avg_normal = (avg_x / avg_magnitude, avg_y / avg_magnitude)  # Normalize the average normal
+
+            if np.isnan(avg_normal[0]) or np.isnan(avg_normal[1]):
+                avg_normal = (0, 0)
 
             # Replace the current normal with the average normal
             average_normals.append(((i, j), avg_normal))
@@ -93,8 +102,7 @@ def compute_average_normals(normals, neighbor_count=10):
 
 def extract_normals(central_axis):
     # Skeletonize the central axis image
-    skeleton, points = utils.skeletonize_image(central_axis)
-    skeleton = cv2.GaussianBlur(skeleton, (3, 3), 0)
+    _, points = utils.skeletonize_image(central_axis)
     points = utils.sort_points(points)
 
     # Sobel filter to compute the gradient
@@ -138,7 +146,7 @@ def extract_normals(central_axis):
     # Transform to dict
     normals_dict = {key: value for key, value in average_normals}
 
-    return normals_dict, points, skeleton
+    return normals_dict, points
 
 if __name__ == "__main__":
     # Parse the arguments
@@ -151,16 +159,15 @@ if __name__ == "__main__":
     # Load the central axis image
     central_axis = cv2.imread(central_axis_path, cv2.IMREAD_GRAYSCALE)
     central_axis = utils.scale_image(central_axis)
-    central_axis = cv2.bitwise_not(central_axis) # Invert the image
     skeleton, points = utils.skeletonize_image(central_axis)
     skeleton_rgb = cv2.cvtColor(skeleton, cv2.COLOR_GRAY2BGR)
 
     # Compute normals
-    normals, _, _ = extract_normals(central_axis)
+    normals, _ = extract_normals(central_axis)
 
     line_length = 10
     for (i, j), (norm_x, norm_y) in normals.items():
-        if norm_x != 0 or norm_y != 0:
+        if not(norm_x == 0 and norm_y == 0):
             x1 = j
             y1 = i
             x2 = int(j + line_length * norm_x)

@@ -52,8 +52,7 @@ for road_path in  road_paths:
 
     # Canny edge detection
     edges = cv2.Canny(road_blurred, 100, 125)
-    cv2.imshow("",edges)
-    cv2.waitKey(0)
+
     # Create the segmentation mask
     segmentation_mask = np.zeros(road.shape[:2])
 
@@ -66,7 +65,8 @@ for road_path in  road_paths:
             projected_line = utils.project_on_image(line, pic_min_x, pic_min_y, pic_max_x, pic_max_y, road.shape[1], road.shape[0]) #vraiment road.shape?
             for i in range(len(projected_line) - 1):
                 cv2.line(central_axis, projected_line[i], projected_line[i + 1], 255, 2)
-
+        cv2.imshow("central_axis", central_axis)
+        cv2.waitKey(0)
 
         # Find the road edges using normals
         normals, points = extract_normals(central_axis)

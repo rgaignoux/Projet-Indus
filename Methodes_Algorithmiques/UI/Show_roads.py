@@ -75,12 +75,12 @@ def generate_random_color():
     return (red, green, blue)
 
 
-folder = "images_to_segment/"
+folder = "Methodes_Algorithmiques/UI/images_to_segment/"
 file_list = os.listdir(folder)
 
 # Fonction principale
 for file in file_list:
-    json_file = 'Data/filaires-projection.json'  # Chemin du fichier JSON
+    json_file = 'Methodes_Algorithmiques/UI/Data/filaires-projection.json'  # Chemin du fichier JSON
 
     # Charger les données
     img, pic_min_x, pic_min_y, pic_max_x, pic_max_y = load_orthophoto(folder, file)

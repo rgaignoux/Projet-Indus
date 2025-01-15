@@ -8,7 +8,7 @@ import glob
 import os
 from draw_normals import extract_normals
 
-def remove_outliers_and_compute_mean(widths_around, lower_percentile=3, upper_percentile=97):
+def remove_outliers_and_compute_mean(widths_around, lower_percentile=2, upper_percentile=98):
     if not widths_around:
         return 0
         
@@ -51,16 +51,14 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
     # Load the central axis image
     central_axis = cv2.imread(axis_path, cv2.IMREAD_GRAYSCALE)
     central_axis = cv2.resize(central_axis, (road.shape[1], road.shape[0]))
-
-    """ utils.display_image("Road", road)
-    utils.display_image("Axe", central_axis) """
+    # central_axis = cv2.bitwise_not(central_axis) # si ancien dateset : décommenter
 
     # Filter out the white pixels
     hsv_image = cv2.cvtColor(road, cv2.COLOR_BGR2HSV)
     lower_white = np.array([0, 0, 150])
     upper_white = np.array([180, 50, 255])
     mask = cv2.inRange(hsv_image, lower_white, upper_white)
-    hsv_image[mask > 0] = [0, 0, 150]
+    hsv_image[mask > 0] = [0, 0, 160]
     road2 = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
 
     # Gaussian filtering
@@ -68,10 +66,10 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
     #road_blurred = cv2.bilateralFilter(road, 9, 75, 75)
 
     # Canny edge detection
-    edges = cv2.Canny(road_blurred, 75, 100)
+    edges = cv2.Canny(road_blurred, 100, 100)
 
     # Find the road edges using normals
-    normals, points = extract_normals(central_axis)
+    normals, points, _ = extract_normals(central_axis)
     widths1 = []
     widths2 = []
 
@@ -114,7 +112,7 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
 
     for index, pos in enumerate(points):
         # Extract 2*k points around the current point
-        k = 150
+        k = 100
         (i, j) = pos
         start = index - k
         end = index + k
@@ -183,7 +181,6 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
     # Post process segmentation
     segmentation_mask = cv2.morphologyEx(segmentation_mask, cv2.MORPH_CLOSE, np.ones((3, 3)), iterations=3)
     segmentation_mask = (segmentation_mask * 255).astype(np.uint8)
-    segmentation_mask = cv2.medianBlur(segmentation_mask, 5)
     filename = os.path.splitext(os.path.basename(road_path))[0]
     cv2.imwrite(f"perpendicular_Method//results//segm_{filename}.png", segmentation_mask)
     if display == 1:
@@ -191,7 +188,8 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
 
     # Overlay the segmentation on the road image
     result = road.copy()
-    result[segmentation_mask >= 1] = (0.5 * np.array([0, 0, 255]) + 0.5 * result[segmentation_mask >= 1]).astype(np.uint8)
+    result[central_axis >= 1] = np.array([0, 0, 0])
+    result[segmentation_mask >= 1] = (0.4 * np.array([0, 255, 255]) + 0.6 * result[segmentation_mask >= 1]).astype(np.uint8)
     
     cv2.imwrite(f"perpendicular_Method//results//overlay_{filename}.png", result)
     if display == 1:

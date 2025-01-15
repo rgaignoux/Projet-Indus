@@ -2,10 +2,12 @@ import cv2
 import numpy as np
 from skimage import morphology
 import math
-def display_image(window_name, img):
+def display_image(window_name, img, scale = False):
     """
     Display an image in a window with the given name.
     """
+    if scale:
+        img = resize_image(img)
     cv2.imshow(window_name, img)
     cv2.waitKey(0)  # Wait until a key is pressed
     cv2.destroyAllWindows()

@@ -39,3 +39,8 @@ Voici quelques résultats obtenus après segmentation des routes avec ArcGIS :
 
 ### 🖼️ Image 6
 ![Segmentation 6](https://github.com/rgaignoux/Projet-Indus/blob/Mawa/Resultats_ArcGIS_segmentation/route3_segmented.png?raw=true)
+
+
+## 🏁 Temps d'inférence du modèle
+
+

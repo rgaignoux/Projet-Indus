@@ -72,10 +72,13 @@ def scale_image(img, scale_percent = 65):
     return img
 
 
-def skeletonize_image(img):
+def skeletonize_image(img, invert=True):
     """
     Skeletonize the given image.
     """
+    if invert:
+        img = cv2.bitwise_not(img)
+        
     # Convert the image to a binary boolean array to skeletonize it
     binary_bool = img > 0
 

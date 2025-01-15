@@ -72,15 +72,16 @@ def scale_image(img, scale_percent = 65):
     return img
 
 
-def skeletonize_image(img, invert=True):
+def skeletonize_image(img, invert=False):
     """
     Skeletonize the given image.
     """
+    img_copy = np.copy(img)
     if invert:
-        img = cv2.bitwise_not(img)
+        img_copy = cv2.bitwise_not(img_copy)
         
     # Convert the image to a binary boolean array to skeletonize it
-    binary_bool = img > 0
+    binary_bool = img_copy > 0
 
     # Skeletonize the image
     skeleton = morphology.skeletonize(binary_bool)

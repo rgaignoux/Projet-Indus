@@ -13,13 +13,13 @@ from PIL import Image
 
 # Chargement de l'orthophotographie
 def load_orthophoto(folder, file):
-    print("load", folder+file)
-    img = cv2.imread(folder + file)
+    #print("load", folder+file)
+    img = cv2.imread(folder + file,cv2.IMREAD_COLOR)
     dims_string = file[6:-4]  # On considère que l'image a pour nom "mosaic ... .png"
     dims_string = dims_string.split("-")
     pic_min_x, pic_min_y = float(dims_string[0]), float(dims_string[1])
     pic_max_x, pic_max_y = float(dims_string[2]), float(dims_string[3])
-    print("frame :", pic_min_x, pic_min_y, pic_max_x, pic_max_y)
+    #print("frame :", pic_min_x, pic_min_y, pic_max_x, pic_max_y)
     return img, pic_min_x, pic_min_y, pic_max_x, pic_max_y
 
 def line_in_image(line, pic_min_x, pic_min_y, pic_max_x, pic_max_y):

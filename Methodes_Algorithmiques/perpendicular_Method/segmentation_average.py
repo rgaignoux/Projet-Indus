@@ -8,15 +8,21 @@ import glob
 import os
 from draw_normals import extract_normals
 
-def remove_outliers(widths_around, average, threshold = 0.5):
-    # Remove outliers using z-score method
-    if np.std(widths_around) != 0:
-        z_scores = np.abs((widths_around - average) / np.std(widths_around))
-        widths_around = [w for w, z in zip(widths_around, z_scores) if z < threshold]
+def remove_outliers_and_compute_mean(widths_around, lower_percentile=2, upper_percentile=98):
+    if not widths_around:
+        return 0
+        
+    lower_bound = np.percentile(widths_around, lower_percentile)
+    upper_bound = np.percentile(widths_around, upper_percentile)
+    filtered_widths = []
 
-    # Update the average width
-    if widths_around:
-        average = np.mean(widths_around)
+    for w in widths_around:
+        if lower_bound <= w <= upper_bound:
+            filtered_widths.append(w)
+
+    average = 0
+    if filtered_widths:
+        average = np.mean(filtered_widths)
 
     return average
 
@@ -24,7 +30,7 @@ def remove_outliers(widths_around, average, threshold = 0.5):
 parser = argparse.ArgumentParser()
 parser.add_argument('-dir', type=str) # Directory path containing the images
 parser.add_argument('-min', type=int, default=1) # Min range for edge detection
-parser.add_argument('-max', type=int, default=30) # Max range for edge detection
+parser.add_argument('-max', type=int, default=50) # Max range for edge detection
 parser.add_argument('-display', type=int, default=0) # 0 : don't display images, 1 : display images 
 
 args = parser.parse_args()
@@ -49,20 +55,22 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
 
     # Filter out the white pixels
     hsv_image = cv2.cvtColor(road, cv2.COLOR_BGR2HSV)
-    lower_white = np.array([0, 0, 140])
-    upper_white = np.array([180, 40, 255])
+    lower_white = np.array([0, 0, 150])
+    upper_white = np.array([180, 50, 255])
     mask = cv2.inRange(hsv_image, lower_white, upper_white)
     hsv_image[mask > 0] = [0, 0, 160]
     road2 = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
 
     # Gaussian filtering
-    road_blurred = cv2.bilateralFilter(road2, 9, 150, 150)
+    road_blurred = cv2.GaussianBlur(road2, (5,5), 0)
+    road_blurred = cv2.GaussianBlur(road2, (5,5), 0)
+    #road_blurred = cv2.bilateralFilter(road, 9, 75, 75)
 
     # Canny edge detection
-    edges = cv2.Canny(road_blurred, 100, 125)
+    edges = cv2.Canny(road_blurred, 100, 100)
 
     # Find the road edges using normals
-    normals, points = extract_normals(central_axis)
+    normals, points, _ = extract_normals(central_axis)
     widths1 = []
     widths2 = []
 
@@ -105,7 +113,7 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
 
     for index, pos in enumerate(points):
         # Extract 2*k points around the current point
-        k = 100
+        k = 125
         (i, j) = pos
         start = index - k
         end = index + k
@@ -118,17 +126,19 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
             start -= abs(end - len(points) + 1)
             end = len(points) - 1
 
-        # Compute the average widths
+        # Compute the weighted average widths
         widths1_around = []
         widths2_around = []
+
         for idx_pt in range(start, end):
             pt = points[idx_pt]
-            if utils.distance(pt, pos) <= k:
+            dist = utils.distance(pt, pos)
+            if dist <= k:
                 widths1_around.append(widths1[idx_pt])
                 widths2_around.append(widths2[idx_pt])
 
-        average1 = np.mean(widths1_around)
-        average2 = np.mean(widths2_around)
+        average1 = remove_outliers_and_compute_mean(widths1_around)
+        average2 = remove_outliers_and_compute_mean(widths2_around)
 
         average_widths1[(i, j)] = average1
         average_widths2[(i, j)] = average2
@@ -175,7 +185,7 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
     filename = os.path.splitext(os.path.basename(road_path))[0]
     cv2.imwrite(f"perpendicular_Method//results//segm_{filename}.png", segmentation_mask)
     if display == 1:
-        utils.display_image("Segmentation",segmentation_mask)
+        utils.display_image("Segmentation")
 
     # Overlay the segmentation on the road image
     result = road.copy()

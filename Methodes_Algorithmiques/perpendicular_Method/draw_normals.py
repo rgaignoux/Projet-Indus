@@ -4,6 +4,7 @@ import sys
 import argparse
 import utils
 import math
+import os
 
 def angle_between_vectors(v1, v2):
     dot_product = v1[0] * v2[0] + v1[1] * v2[1]
@@ -22,8 +23,10 @@ def remove_normals_outliers(normals, angle_threshold = np.pi / 20):
         neighbor_normals = []
         for offset in range(-5, 5):
             neighbor_idx = idx + offset
+
             if 0 <= neighbor_idx < len(normals):
                 _, (neighbor_x, neighbor_y) = normals[neighbor_idx]
+
                 if neighbor_x != 0 or neighbor_y != 0:
                     neighbor_normals.append((neighbor_x, neighbor_y))
                 
@@ -151,4 +154,6 @@ if __name__ == "__main__":
             cv2.line(skeleton_rgb, (x1, y1), (x2, y2), (0, 0, 255), 1)
             cv2.line(skeleton_rgb, (x1, y1), (x3, y3), (0, 255, 0), 1)
 
+    filename = os.path.splitext(os.path.basename(central_axis_path))[0]
+    cv2.imwrite(f"perpendicular_Method//results//normals_{filename}.png", skeleton_rgb)
     utils.display_image("Normals", skeleton_rgb)

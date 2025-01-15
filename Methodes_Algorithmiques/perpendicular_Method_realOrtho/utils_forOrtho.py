@@ -140,8 +140,8 @@ def overlay_mask(image, mask, bgr = True):
 def load_orthophoto(folder, file):
     print("load", folder+file)
     img = cv2.imread(folder + file)
-    dims_string = file[6:-4]  # On considère que l'image a pour nom "mosaic ... .png"
-    dims_string = dims_string.split("-")
+    dims_string = file[5:-4]  # On considère que l'image a pour nom "road ... .png"
+    dims_string = dims_string.split("_")
     pic_min_x, pic_min_y = float(dims_string[0]), float(dims_string[1])
     pic_max_x, pic_max_y = float(dims_string[2]), float(dims_string[3])
     print("frame :", pic_min_x, pic_min_y, pic_max_x, pic_max_y)

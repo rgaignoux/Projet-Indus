@@ -65,9 +65,16 @@ for road_path in  road_paths:
             projected_line = utils.project_on_image(line, pic_min_x, pic_min_y, pic_max_x, pic_max_y, road.shape[1], road.shape[0]) #vraiment road.shape?
             for i in range(len(projected_line) - 1):
                 cv2.line(central_axis, projected_line[i], projected_line[i + 1], 255, 2)
-        cv2.imshow("central_axis", central_axis)
-        cv2.waitKey(0)
+        # Redimensionner l'image à 50% de sa taille
+        scale_percent = 50  # Pourcentage de redimensionnement
+        width = int(segmentation_mask.shape[1] * scale_percent / 100)
+        height = int(segmentation_mask.shape[0] * scale_percent / 100)
+        dim = (width, height)
 
+        # Redimensionner l'image
+        resized_image = cv2.resize(central_axis, dim, interpolation=cv2.INTER_AREA)
+        cv2.imshow("central_axis", resized_image)
+        cv2.waitKey(0)
         # Find the road edges using normals
         normals, points = extract_normals(central_axis)
         widths1 = []
@@ -136,6 +143,19 @@ for road_path in  road_paths:
 
                 if x3 >= 0 and x3 < edges.shape[1] and y3 >= 0 and y3 < edges.shape[0]:
                     segmentation_mask[y3, x3] = 1
+
+        # Redimensionner l'image à 50% de sa taille
+        scale_percent = 50  # Pourcentage de redimensionnement
+        width = int(segmentation_mask.shape[1] * scale_percent / 100)
+        height = int(segmentation_mask.shape[0] * scale_percent / 100)
+        dim = (width, height)
+
+        # Redimensionner l'image
+        resized_image = cv2.resize(segmentation_mask, dim, interpolation=cv2.INTER_AREA)
+
+        # Afficher l'image redimensionnée
+        cv2.imshow("Segmentation", resized_image)
+        cv2.waitKey(0)
 
 
     # Post process segmentation

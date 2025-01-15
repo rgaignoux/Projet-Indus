@@ -72,17 +72,19 @@ def scale_image(img, scale_percent = 65):
     return img
 
 
-def skeletonize_image(img):
+def skeletonize_image(img, invert=False):
     """
     Skeletonize the given image.
     """
+    if invert:
+        img = cv2.bitwise_not(img.astype(np.uint8))
+        
     # Convert the image to a binary boolean array to skeletonize it
     binary_bool = img > 0
 
     # Skeletonize the image
     skeleton = morphology.skeletonize(binary_bool)
     skeleton = np.uint8(skeleton) * 255
-
     # Exract the points from the skeleton
     points = get_points_central_axis(skeleton)
 

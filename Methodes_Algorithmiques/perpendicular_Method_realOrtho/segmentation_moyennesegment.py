@@ -38,7 +38,7 @@ for road_path in  road_paths:
 
     # Load the road image
     road, pic_min_x, pic_min_y, pic_max_x, pic_max_y = utils.load_orthophoto(directory_path+"/", road_path)
-
+    show_pb=road.copy()
     # Filter out the white pixels
     hsv_image = cv2.cvtColor(road, cv2.COLOR_BGR2HSV)
     lower_white = np.array([0, 0, 140])
@@ -65,17 +65,9 @@ for road_path in  road_paths:
             projected_line = utils.project_on_image(line, pic_min_x, pic_min_y, pic_max_x, pic_max_y, road.shape[1], road.shape[0]) #vraiment road.shape?
             for i in range(len(projected_line) - 1):
                 cv2.line(central_axis, projected_line[i], projected_line[i + 1], 255, 2)
-        # Redimensionner l'image à 50% de sa taille
-        scale_percent = 50  # Pourcentage de redimensionnement
-        width = int(segmentation_mask.shape[1] * scale_percent / 100)
-        height = int(segmentation_mask.shape[0] * scale_percent / 100)
-        dim = (width, height)
-
-        # Redimensionner l'image
-        resized_image = cv2.resize(central_axis, dim, interpolation=cv2.INTER_AREA)
-        cv2.imshow("central_axis", resized_image)
-        cv2.waitKey(0)
         # Find the road edges using normals
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))  # Élément structurant de taille 5x5
+        central_axis = cv2.dilate(central_axis, kernel, iterations=1)
         normals, points = extract_normals(central_axis)
         widths1 = []
         widths2 = []
@@ -124,39 +116,34 @@ for road_path in  road_paths:
         widths2=remove_outliers(widths2, average_widths2)
         
         for pos in points:
+
             (i, j) = pos
 
             (norm_x, norm_y) = normals[(i, j)]
 
             # Flag in the normal direction
             for n in range(width1): 
-                x2 = int(j + n * norm_x)
-                y2 = int(i + n * norm_y)
+                x2 = int(j + n )
+                y2 = int(i + n )
 
                 if x2 >= 0 and x2 < edges.shape[1] and y2 >= 0 and y2 < edges.shape[0]:
+                    cv2.line(show_pb, (j, i), (x2, y2), (0, 0, 255), 2)
                     segmentation_mask[y2, x2] = 1
                 
             # Flag in the opposite direction
             for n in range(width2):
-                x3 = int(j - n * norm_x)
-                y3 = int(i - n * norm_y)
+                x3 = int(j - n )
+                y3 = int(i - n )
 
                 if x3 >= 0 and x3 < edges.shape[1] and y3 >= 0 and y3 < edges.shape[0]:
+                    cv2.line(show_pb, (j, i), (x3, y3), (0, 255, 0), 2)
                     segmentation_mask[y3, x3] = 1
+            
+            
+        #cv2.imshow("road", show_pb)    
+        #cv2.waitKey(0)
 
-        # Redimensionner l'image à 50% de sa taille
-        scale_percent = 50  # Pourcentage de redimensionnement
-        width = int(segmentation_mask.shape[1] * scale_percent / 100)
-        height = int(segmentation_mask.shape[0] * scale_percent / 100)
-        dim = (width, height)
-
-        # Redimensionner l'image
-        resized_image = cv2.resize(segmentation_mask, dim, interpolation=cv2.INTER_AREA)
-
-        # Afficher l'image redimensionnée
-        cv2.imshow("Segmentation", resized_image)
-        cv2.waitKey(0)
-
+        
 
     # Post process segmentation
     segmentation_mask = cv2.morphologyEx(segmentation_mask, cv2.MORPH_CLOSE, np.ones((3, 3)), iterations=3)

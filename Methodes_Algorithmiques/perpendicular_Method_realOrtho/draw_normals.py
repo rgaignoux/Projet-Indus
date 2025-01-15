@@ -67,8 +67,8 @@ def extract_normals(central_axis):
     points = utils.sort_points(points)
 
     # Sobel filter to compute the gradient
-    sobel_x = cv2.Sobel(central_axis, cv2.CV_64F, 1, 0, ksize=5)
-    sobel_y = cv2.Sobel(central_axis, cv2.CV_64F, 0, 1, ksize=5)
+    sobel_x = cv2.Sobel(skeleton, cv2.CV_64F, 1, 0, ksize=5)
+    sobel_y = cv2.Sobel(skeleton, cv2.CV_64F, 0, 1, ksize=5)
 
     # Compute normals
     normals = []
@@ -107,7 +107,6 @@ if __name__ == "__main__":
     # Load the central axis image
     central_axis = cv2.imread(central_axis_path, cv2.IMREAD_GRAYSCALE)
     central_axis = utils.scale_image(central_axis)
-    central_axis = cv2.bitwise_not(central_axis) # Invert the image
     skeleton, points = utils.skeletonize_image(central_axis)
     skeleton_rgb = cv2.cvtColor(skeleton, cv2.COLOR_GRAY2BGR)
 

@@ -12,7 +12,7 @@ Deux approches principales ont été utilisées pour la segmentation des images 
 
 J'ai aussi exploiré une piste de segmentation avec **ArcGIS Pro** en utilisant des **librairies Deep Learning**.
 
-Ces modèles sont entraînés pour segmenter les routes et trottoirs et générer des masques indiquant leurs emplacements.
+Ces modèles sont entraînés pour segmenter les routes et générer des masques indiquant leurs emplacements.
 
 
 

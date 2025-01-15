@@ -17,7 +17,7 @@ python3 .\perpendicular_Method\segmentation_average.py -dir="images/ImagesRennes
 - **Skeletonization** de l'image de l'axe central et calcul de la normal en chaque point via filtres de Sobel 5x5
 - **Postprocess** des normales (correction des directions + remplacement des outliers)
 
-![alt text](results/ancien_dataset/normales.png)
+![alt text](results/normales.png)
 
 3. **Calcul des longueurs en chaque point de l'axe central skeletonizé :**
 - Calcul des contours de l'image de route preprocess, via filtre de Canny
@@ -38,12 +38,12 @@ python3 .\perpendicular_Method\segmentation_average.py -dir="images/ImagesRennes
 
 ## Quelques images de normales :
 
-![alt text](results/ancien_dataset/normales/normals_axe_1352000_7222000_1352200_7222200.png)
-![alt text](results/ancien_dataset/normales/normals_axe_1352000_7222400_1352200_7222600.png)
-![alt text](results/ancien_dataset/normales/normals_axe_1352000_7222800_1352200_7223000.png)
-![alt text](results/ancien_dataset/normales/normals_axe_1352000_7223000_1352200_7223200.png)
-![alt text](results/ancien_dataset/normales/normals_axe_1352200_7222000_1352400_7222200.png)
-![alt text](results/ancien_dataset/normales/normals_axe_1352200_7222200_1352400_7222400.png)
+![alt text](results/normales/normals_axe_1352000_7222000_1352200_7222200.png)
+![alt text](results/normales/normals_axe_1352000_7222400_1352200_7222600.png)
+![alt text](results/normales/normals_axe_1352000_7222800_1352200_7223000.png)
+![alt text](results/normales/normals_axe_1352000_7223000_1352200_7223200.png)
+![alt text](results/normales/normals_axe_1352200_7222000_1352400_7222200.png)
+![alt text](results/normales/normals_axe_1352200_7222200_1352400_7222400.png)
 
 ## Segmentations "campagne" :
 

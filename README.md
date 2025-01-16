@@ -1,8 +1,6 @@
 Structure du code:
 
-####################################################################
-####                            Gdal                            ####
-####################################################################
+#Gdal
 
 Le dossier Gdal contient l'ensemble des programmes nécessitant l'utilisation de la bibliothèque
 Gdal.
@@ -50,9 +48,7 @@ d'obtenir en plus les masques de filaire de voie correspondants.
 Gdal/test_polygones_batiments.py : Inachevé. Utilisation des géométries de bâtiments fournies
 pour créer des masques et aider ainsi à la segmentation.
 
-####################################################################
-####                        mask_creator                        ####
-####################################################################
+#mask_creator
 
 Le  dossier mask_creator contient le nécessaire pour créer des masques d'images utilisés ensuite
 pour l'apprentissage et l'évaluation de modèles. Le programme n'utilise pas Gdal mais nécessite

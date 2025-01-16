@@ -24,7 +24,7 @@ Ce score reflète les défis liés à l'entraînement sur un petit jeu de donné
 Voici quelques résultats obtenus  :
 
 ### 🖼️ Image 1
-![Segmentation 1](https://github.com/rgaignoux/Projet-Indus/blob/Mawa/Resultats_ArcGIS_segmentation/route11_segmentee.png?raw=true)
+![Segmentation 1](https://github.com/rgaignoux/Projet-Indus/blob/Mawa/fine_tuning/image6_segmentation_fine_tuning.png?raw=true)
 
 ### 🖼️ Image 2
-![Segmentation 2](https://github.com/rgaignoux/Projet-Indus/blob/Mawa/Resultats_ArcGIS_segmentation/route15_segmented.png?raw=true)
+![Segmentation 2](https://github.com/rgaignoux/Projet-Indus/blob/Mawa/fine_tuning/image6_segmentation_fine_tuning.png?raw=true)

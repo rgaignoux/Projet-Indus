@@ -1,5 +1,5 @@
 ## Description
-Ce projet implémente un fine-tuning du modèle DeepLabV3 pour la segmentation de routes à partir d'images satellites. Le modèle a été entraîné sur un jeu de données de 50 images et testé sur un ensemble de 22 images pour évaluer ses performances. Malgré la petite taille du jeu de données, l'objectif est de demontrer l'efficacité du fine-tuning pour des applications spécifiques et de préparer le modèle pour des améliorations futures.
+Ce code implémente un fine-tuning du modèle DeepLabV3 pour la segmentation de routes à partir d'images satellites. Le modèle a été entraîné sur un jeu de données de 50 images et testé sur un ensemble de 22 images pour évaluer ses performances. Malgré la petite taille du jeu de données, l'objectif est de demontrer l'efficacité du fine-tuning pour des applications spécifiques et de préparer le modèle pour des améliorations futures.
 
 
 ## Modèle Utilisé

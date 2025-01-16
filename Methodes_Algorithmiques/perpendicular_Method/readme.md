@@ -36,6 +36,10 @@ python3 .\perpendicular_Method\segmentation_average.py -dir="images/ImagesRennes
 - **Average Recall :** `0.8559`
 - **Average F1 Score :** `0.8410`
 
+## Largeur en mètres
+
+![alt text](results/widthvisualizer.PNG)
+
 ## Quelques images de normales :
 
 ![alt text](results/normales/normals_axe_1352000_7222000_1352200_7222200.png)

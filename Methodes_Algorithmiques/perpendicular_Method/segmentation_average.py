@@ -50,8 +50,6 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
 
     # Load the central axis image
     central_axis = cv2.imread(axis_path, cv2.IMREAD_GRAYSCALE)
-    central_axis = cv2.resize(central_axis, (road.shape[1], road.shape[0]))
-    #central_axis = cv2.bitwise_not(central_axis) # si ancien dateset : décommenter
 
     # Filter out the white pixels
     hsv_image = cv2.cvtColor(road, cv2.COLOR_BGR2HSV)
@@ -63,7 +61,6 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
 
     # Gaussian filtering
     road_blurred = cv2.GaussianBlur(road2, (5,5), 0)
-    #road_blurred = cv2.bilateralFilter(road, 9, 75, 75)
 
     # Canny edge detection
     edges = cv2.Canny(road_blurred, 85, 85)

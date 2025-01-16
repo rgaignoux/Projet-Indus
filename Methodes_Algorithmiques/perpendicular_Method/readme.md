@@ -49,6 +49,10 @@ python3 .\perpendicular_Method\segmentation_average.py -dir="images/ImagesRennes
 ![alt text](results/normales/normals_axe_1352200_7222000_1352400_7222200.png)
 ![alt text](results/normales/normals_axe_1352200_7222200_1352400_7222400.png)
 
+### Problème : normales sur image skeleton
+
+![alt text](results/normales/skeleton_normales.png)
+
 ## Segmentations "campagne" :
 
 ![alt text](results/ancien_dataset/overlay_route0.png)

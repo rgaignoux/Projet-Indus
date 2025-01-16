@@ -27,4 +27,4 @@ Voici quelques résultats obtenus  :
 ![Segmentation 1](https://github.com/rgaignoux/Projet-Indus/blob/Mawa/fine_tuning/image6_segmentation_fine_tuning.png?raw=true)
 
 ### 🖼️ Image 2
-![Segmentation 2](https://github.com/rgaignoux/Projet-Indus/blob/Mawa/fine_tuning/image6_segmentation_fine_tuning.png?raw=true)
+![Segmentation 2](https://github.com/rgaignoux/Projet-Indus/blob/Mawa/fine_tuning/prediction_image12_fine_tuning.png?raw=true)

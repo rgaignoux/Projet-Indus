@@ -21,3 +21,5 @@ road_types = {
     'Carrefour', 'Place', 'Allée', 'Pont', 'Inconnu'
 }
 ```
+
+[!alt](axe_1352000_7222000_1352200_7222200.png)

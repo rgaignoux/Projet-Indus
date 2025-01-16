@@ -9,7 +9,7 @@ DeepLabV3 : Un modèle de segmentation d'image basé sur des réseaux de neurone
 -**Framework** : PyTorch
 
 ## Entraînement
-Nombre d'images pour l'entraînement : 50 images
+Nombre d'images pour l'entraînement : 30 images
 Nombre d'epochs : 10
 
 ## Résultats

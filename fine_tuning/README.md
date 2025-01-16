@@ -16,3 +16,15 @@ Nombre d'epochs : 10
 **Métrique de Performance**
 IoU moyen sur le jeu de test : **0.1368**
 Ce score reflète les défis liés à l'entraînement sur un petit jeu de données et met en lumière les opportunités d'amélioration par l'augmentation du jeu de données.
+
+
+
+## 🏁 Résultats obtenus après fine tuning
+
+Voici quelques résultats obtenus  :
+
+### 🖼️ Image 1
+![Segmentation 1](https://github.com/rgaignoux/Projet-Indus/blob/Mawa/Resultats_ArcGIS_segmentation/route11_segmentee.png?raw=true)
+
+### 🖼️ Image 2
+![Segmentation 2](https://github.com/rgaignoux/Projet-Indus/blob/Mawa/Resultats_ArcGIS_segmentation/route15_segmented.png?raw=true)

@@ -54,6 +54,8 @@ for road_path in  road_paths:
     # Canny edge detection
     edges = cv2.Canny(road_blurred, 100, 125)
 
+
+
     # Create the segmentation mask
     segmentation_mask = np.zeros(road.shape[:2])
 
@@ -134,8 +136,6 @@ for road_path in  road_paths:
                     segmentation_mask[y3, x3] = 1
 
 
-        
-
     # Post process segmentation
     segmentation_mask = cv2.morphologyEx(segmentation_mask, cv2.MORPH_CLOSE, np.ones((3, 3)), iterations=3)
     segmentation_mask = (segmentation_mask * 255).astype(np.uint8)
@@ -148,7 +148,13 @@ for road_path in  road_paths:
     result = road.copy()
     result[central_axis >= 1] = np.array([0, 0, 0])
     result[segmentation_mask >= 1] = (0.4 * np.array([0, 255, 255]) + 0.6 * result[segmentation_mask >= 1]).astype(np.uint8)
-    
+    road_resized = cv2.resize(result, (result.shape[1] // 2, result.shape[0] // 2))
+    edges_resized = cv2.resize(edges, (edges.shape[1] // 2, edges.shape[0] // 2))
+    edges_colored = cv2.cvtColor(edges_resized, cv2.COLOR_GRAY2BGR)
+    concatenated = cv2.hconcat([road_resized, edges_colored])
+    cv2.imshow("Canny", concatenated)
+    cv2.waitKey(0)
+
     cv2.imwrite(f"Methodes_Algorithmiques/perpendicular_Method_realOrtho//results//overlay_{filename}.png", result)
     if display == 1:
         utils.display_image("Result", result)

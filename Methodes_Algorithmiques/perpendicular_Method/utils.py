@@ -2,10 +2,12 @@ import cv2
 import numpy as np
 from skimage import morphology
 import math
-def display_image(window_name, img):
+def display_image(window_name, img, scale = False):
     """
     Display an image in a window with the given name.
     """
+    if scale:
+        img = resize_image(img)
     cv2.imshow(window_name, img)
     cv2.waitKey(0)  # Wait until a key is pressed
     cv2.destroyAllWindows()
@@ -75,11 +77,15 @@ def scale_image(img, scale_percent = 65):
 def skeletonize_image(img, invert=False):
     """
     Skeletonize the given image.
+<<<<<<< HEAD
     """
     img_copy = np.copy(img)
     if invert:
         img_copy = cv2.bitwise_not(img_copy)
         
+=======
+    """ 
+>>>>>>> 8af5a84c77b0032ff98a0cb6d02ea2237a290f81
     # Convert the image to a binary boolean array to skeletonize it
     binary_bool = img_copy > 0
 

@@ -40,7 +40,7 @@ display = args.display
 # Images paths
 directory_path = args.dir
 axes_paths = glob.glob(f"{directory_path}//axe*.png")
-road_paths = glob.glob(f"{directory_path}//route*.png")
+road_paths = glob.glob(f"{directory_path}//road*.png")
 
 for (axis_path, road_path) in zip(axes_paths, road_paths):
     print("Processing image...")
@@ -51,7 +51,7 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
     # Load the central axis image
     central_axis = cv2.imread(axis_path, cv2.IMREAD_GRAYSCALE)
     central_axis = cv2.resize(central_axis, (road.shape[1], road.shape[0]))
-    central_axis = cv2.bitwise_not(central_axis) # Invert the image
+    #central_axis = cv2.bitwise_not(central_axis) # si ancien dateset : décommenter
 
     # Filter out the white pixels
     hsv_image = cv2.cvtColor(road, cv2.COLOR_BGR2HSV)
@@ -63,11 +63,10 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
 
     # Gaussian filtering
     road_blurred = cv2.GaussianBlur(road2, (5,5), 0)
-    road_blurred = cv2.GaussianBlur(road2, (5,5), 0)
     #road_blurred = cv2.bilateralFilter(road, 9, 75, 75)
 
     # Canny edge detection
-    edges = cv2.Canny(road_blurred, 100, 100)
+    edges = cv2.Canny(road_blurred, 85, 85)
 
     # Find the road edges using normals
     normals, points, _ = extract_normals(central_axis)
@@ -113,7 +112,7 @@ for (axis_path, road_path) in zip(axes_paths, road_paths):
 
     for index, pos in enumerate(points):
         # Extract 2*k points around the current point
-        k = 125
+        k = 150
         (i, j) = pos
         start = index - k
         end = index + k

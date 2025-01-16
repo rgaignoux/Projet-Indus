@@ -36,70 +36,128 @@ python3 .\perpendicular_Method\segmentation_average.py -dir="images/ImagesRennes
 - **Average Recall :** `0.8559`
 - **Average F1 Score :** `0.8410`
 
-## Segmentations :
+## Quelques images de normales :
 
-![alt text](results/overlay_route0.png)
-![alt text](results/segm_route0.png)
+![alt text](results/normales/normals_axe_1352000_7222000_1352200_7222200.png)
+![alt text](results/normales/normals_axe_1352000_7222400_1352200_7222600.png)
+![alt text](results/normales/normals_axe_1352000_7222800_1352200_7223000.png)
+![alt text](results/normales/normals_axe_1352000_7223000_1352200_7223200.png)
+![alt text](results/normales/normals_axe_1352200_7222000_1352400_7222200.png)
+![alt text](results/normales/normals_axe_1352200_7222200_1352400_7222400.png)
 
-![alt text](results/overlay_route1.png)
-![alt text](results/segm_route1.png)
+## Segmentations "campagne" :
 
-![alt text](results/overlay_route2.png)
-![alt text](results/segm_route2.png)
+![alt text](results/ancien_dataset/overlay_route0.png)
+![alt text](results/ancien_dataset/segm_route0.png)
 
-![alt text](results/overlay_route3.png)
-![alt text](results/segm_route3.png)
+![alt text](results/ancien_dataset/overlay_route1.png)
+![alt text](results/ancien_dataset/segm_route1.png)
 
-![alt text](results/overlay_route4.png)
-![alt text](results/segm_route4.png)
+![alt text](results/ancien_dataset/overlay_route2.png)
+![alt text](results/ancien_dataset/segm_route2.png)
 
-![alt text](results/overlay_route5.png)
-![alt text](results/segm_route5.png)
+![alt text](results/ancien_dataset/overlay_route3.png)
+![alt text](results/ancien_dataset/segm_route3.png)
 
-![alt text](results/overlay_route6.png)
-![alt text](results/segm_route6.png)
+![alt text](results/ancien_dataset/overlay_route4.png)
+![alt text](results/ancien_dataset/segm_route4.png)
 
-![alt text](results/overlay_route7.png)
-![alt text](results/segm_route7.png)
+![alt text](results/ancien_dataset/overlay_route5.png)
+![alt text](results/ancien_dataset/segm_route5.png)
 
-![alt text](results/overlay_route8.png)
-![alt text](results/segm_route8.png)
+![alt text](results/ancien_dataset/overlay_route6.png)
+![alt text](results/ancien_dataset/segm_route6.png)
 
-![alt text](results/overlay_route9.png)
-![alt text](results/segm_route9.png)
+![alt text](results/ancien_dataset/overlay_route7.png)
+![alt text](results/ancien_dataset/segm_route7.png)
 
-![alt text](results/overlay_route10.png)
-![alt text](results/segm_route10.png)
+![alt text](results/ancien_dataset/overlay_route8.png)
+![alt text](results/ancien_dataset/segm_route8.png)
 
-![alt text](results/overlay_route11.png)
-![alt text](results/segm_route11.png)
+![alt text](results/ancien_dataset/overlay_route9.png)
+![alt text](results/ancien_dataset/segm_route9.png)
 
-![alt text](results/overlay_route12.png)
-![alt text](results/segm_route12.png)
+![alt text](results/ancien_dataset/overlay_route10.png)
+![alt text](results/ancien_dataset/segm_route10.png)
 
-![alt text](results/overlay_route13.png)
-![alt text](results/segm_route13.png)
+![alt text](results/ancien_dataset/overlay_route11.png)
+![alt text](results/ancien_dataset/segm_route11.png)
 
-![alt text](results/overlay_route14.png)
-![alt text](results/segm_route14.png)
+![alt text](results/ancien_dataset/overlay_route12.png)
+![alt text](results/ancien_dataset/segm_route12.png)
 
-![alt text](results/overlay_route15.png)
-![alt text](results/segm_route15.png)
+![alt text](results/ancien_dataset/overlay_route13.png)
+![alt text](results/ancien_dataset/segm_route13.png)
 
-![alt text](results/overlay_route16.png)
-![alt text](results/segm_route16.png)
+![alt text](results/ancien_dataset/overlay_route14.png)
+![alt text](results/ancien_dataset/segm_route14.png)
 
-![alt text](results/overlay_route17.png)
-![alt text](results/segm_route17.png)
+![alt text](results/ancien_dataset/overlay_route15.png)
+![alt text](results/ancien_dataset/segm_route15.png)
 
-![alt text](results/overlay_route18.png)
-![alt text](results/segm_route18.png)
+![alt text](results/ancien_dataset/overlay_route16.png)
+![alt text](results/ancien_dataset/segm_route16.png)
 
-![alt text](results/overlay_route19.png)
-![alt text](results/segm_route19.png)
+![alt text](results/ancien_dataset/overlay_route17.png)
+![alt text](results/ancien_dataset/segm_route17.png)
 
-![alt text](results/overlay_route20.png)
-![alt text](results/segm_route20.png)
+![alt text](results/ancien_dataset/overlay_route18.png)
+![alt text](results/ancien_dataset/segm_route18.png)
 
-![alt text](results/overlay_route21.png)
-![alt text](results/segm_route21.png)
+![alt text](results/ancien_dataset/overlay_route19.png)
+![alt text](results/ancien_dataset/segm_route19.png)
+
+![alt text](results/ancien_dataset/overlay_route20.png)
+![alt text](results/ancien_dataset/segm_route20.png)
+
+![alt text](results/ancien_dataset/overlay_route21.png)
+![alt text](results/ancien_dataset/segm_route21.png)
+
+## Segmentations "hypercentre" :
+
+![alt text](results/nouveau_dataset/overlay_road_1352000_7222000_1352200_7222200.png)
+![alt text](results/nouveau_dataset/segm_road_1352000_7222000_1352200_7222200.png)
+![alt text](results/nouveau_dataset/overlay_road_1352000_7222400_1352200_7222600.png)
+![alt text](results/nouveau_dataset/segm_road_1352000_7222400_1352200_7222600.png)
+![alt text](results/nouveau_dataset/overlay_road_1352000_7222800_1352200_7223000.png)
+![alt text](results/nouveau_dataset/segm_road_1352000_7222800_1352200_7223000.png)
+![alt text](results/nouveau_dataset/overlay_road_1352000_7223000_1352200_7223200.png)
+![alt text](results/nouveau_dataset/segm_road_1352000_7223000_1352200_7223200.png)
+![alt text](results/nouveau_dataset/overlay_road_1352200_7222000_1352400_7222200.png)
+![alt text](results/nouveau_dataset/segm_road_1352200_7222000_1352400_7222200.png)
+![alt text](results/nouveau_dataset/overlay_road_1352200_7222200_1352400_7222400.png)
+![alt text](results/nouveau_dataset/segm_road_1352200_7222200_1352400_7222400.png)
+![alt text](results/nouveau_dataset/overlay_road_1352200_7222400_1352400_7222600.png)
+![alt text](results/nouveau_dataset/segm_road_1352200_7222400_1352400_7222600.png)
+![alt text](results/nouveau_dataset/overlay_road_1352200_7222600_1352400_7222800.png)
+![alt text](results/nouveau_dataset/segm_road_1352200_7222600_1352400_7222800.png)
+![alt text](results/nouveau_dataset/overlay_road_1352200_7222800_1352400_7223000.png)
+![alt text](results/nouveau_dataset/segm_road_1352200_7222800_1352400_7223000.png)
+![alt text](results/nouveau_dataset/overlay_road_1352200_7223000_1352400_7223200.png)
+![alt text](results/nouveau_dataset/segm_road_1352200_7223000_1352400_7223200.png)
+![alt text](results/nouveau_dataset/overlay_road_1352400_7222200_1352600_7222400.png)
+![alt text](results/nouveau_dataset/segm_road_1352400_7222200_1352600_7222400.png)
+![alt text](results/nouveau_dataset/overlay_road_1352400_7222600_1352600_7222800.png)
+![alt text](results/nouveau_dataset/segm_road_1352400_7222600_1352600_7222800.png)
+![alt text](results/nouveau_dataset/overlay_road_1352400_7222800_1352600_7223000.png)
+![alt text](results/nouveau_dataset/segm_road_1352400_7222800_1352600_7223000.png)
+![alt text](results/nouveau_dataset/overlay_road_1352600_7222200_1352800_7222400.png)
+![alt text](results/nouveau_dataset/segm_road_1352600_7222200_1352800_7222400.png)
+![alt text](results/nouveau_dataset/overlay_road_1352600_7222800_1352800_7223000.png)
+![alt text](results/nouveau_dataset/segm_road_1352600_7222800_1352800_7223000.png)
+![alt text](results/nouveau_dataset/overlay_road_1352800_7222000_1353000_7222200.png)
+![alt text](results/nouveau_dataset/segm_road_1352800_7222000_1353000_7222200.png)
+![alt text](results/nouveau_dataset/overlay_road_1352800_7222200_1353000_7222400.png)
+![alt text](results/nouveau_dataset/segm_road_1352800_7222200_1353000_7222400.png)
+![alt text](results/nouveau_dataset/overlay_road_1352800_7222600_1353000_7222800.png)
+![alt text](results/nouveau_dataset/segm_road_1352800_7222600_1353000_7222800.png)
+![alt text](results/nouveau_dataset/overlay_road_1352800_7222800_1353000_7223000.png)
+![alt text](results/nouveau_dataset/segm_road_1352800_7222800_1353000_7223000.png)
+![alt text](results/nouveau_dataset/overlay_road_1353000_7222600_1353200_7222800.png)
+![alt text](results/nouveau_dataset/segm_road_1353000_7222600_1353200_7222800.png)
+![alt text](results/nouveau_dataset/overlay_road_1353000_7222800_1353200_7223000.png)
+![alt text](results/nouveau_dataset/segm_road_1353000_7222800_1353200_7223000.png)
+![alt text](results/nouveau_dataset/overlay_road_1353000_7223000_1353200_7223200.png)
+![alt text](results/nouveau_dataset/segm_road_1353000_7223000_1353200_7223200.png)
+
+

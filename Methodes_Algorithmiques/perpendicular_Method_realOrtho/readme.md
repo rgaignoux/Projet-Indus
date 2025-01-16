@@ -40,14 +40,14 @@ aucune pour le moment !
 
 ## Segmentations :
 
-![alt text](images_to_segment/mosaic1352646-7225597-1352902.0-7225853.0.png)
-![alt text](results/overlay_mosaic1352646-7225597-1352902.0-7225853.0.png)
-![alt text](results/segm_mosaic1352646-7225597-1352902.0-7225853.0.png)
+![alt text](images_to_segment/road_1352000_7222000_1352200_7222200.png)
+![alt text](results/overlay_road_1352000_7222000_1352200_7222200.png)
+![alt text](results/segm_road_1352000_7222000_1352200_7222200.png)
 
-![alt text](images_to_segment/mosaic1355090-7224178-1355346.0-7224434.0.png)
-![alt text](results/overlay_mosaic1355090-7224178-1355346.0-7224434.0.png)
-![alt text](results/segm_mosaic1352646-7225597-1352902.0-7225853.0.png)
+![alt text](images_to_segment/road_1352000_7222400_1352200_7222600.png)
+![alt text](results/overlay_road_1352000_7222400_1352200_7222600.png)
+![alt text](results/segm_road_1352000_7222400_1352200_7222600.png)
 
-![alt text](images_to_segment/mosaic1358150-7223422-1358406.0-7223678.0.png)
-![alt text](results/overlay_mosaic1358150-7223422-1358406.0-7223678.0.png)
-![alt text](results/segm_mosaic1358150-7223422-1358406.0-7223678.0.png)
+![alt text](images_to_segment/road_1352200_7222600_1352400_7222800.png)
+![alt text](results/overlay_road_1352200_7222600_1352400_7222800.png)
+![alt text](results/segm_road_1352200_7222600_1352400_7222800.png)

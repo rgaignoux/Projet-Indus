@@ -7,6 +7,8 @@ import math
 import glob
 import os
 from draw_normals import extract_normals
+
+
 'python3 .\Methodes_Algorithmiques/perpendicular_Method_realOrtho\segmentation_moyennesegment.py -dir="Methodes_Algorithmiques/perpendicular_Method_realOrtho/images_to_segment"'
 def remove_outliers(widths_around, average, threshold = 0.5):
     # Remove outliers using z-score method
@@ -38,7 +40,6 @@ for road_path in  road_paths:
 
     # Load the road image
     road, pic_min_x, pic_min_y, pic_max_x, pic_max_y = utils.load_orthophoto(directory_path+"/", road_path)
-    show_pb=road.copy()
     # Filter out the white pixels
     hsv_image = cv2.cvtColor(road, cv2.COLOR_BGR2HSV)
     lower_white = np.array([0, 0, 140])
@@ -59,15 +60,14 @@ for road_path in  road_paths:
     #Loop on the different roads in the image
     json_file = 'Methodes_Algorithmiques/perpendicular_Method_realOrtho/Data/filaires-projection.json'
     routes = utils.load_filaires(json_file, pic_min_x, pic_min_y, pic_max_x, pic_max_y)
+
     for route in routes:
         central_axis= np.zeros((road.shape[0], road.shape[1]))
         for line in route:
             projected_line = utils.project_on_image(line, pic_min_x, pic_min_y, pic_max_x, pic_max_y, road.shape[1], road.shape[0]) #vraiment road.shape?
             for i in range(len(projected_line) - 1):
                 cv2.line(central_axis, projected_line[i], projected_line[i + 1], 255, 2)
-        # Find the road edges using normals
-        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))  # Élément structurant de taille 5x5
-        central_axis = cv2.dilate(central_axis, kernel, iterations=1)
+
         normals, points = extract_normals(central_axis)
         widths1 = []
         widths2 = []
@@ -105,13 +105,9 @@ for road_path in  road_paths:
             widths2.append(width2)
 
 
-        #filtrage ? à voir
-
         # Compute the average widths
         average_widths1 = np.mean(widths1)
         average_widths2 = np.mean(widths2)
-        """widths1 = math.floor(np.mean(widths1))
-        widths2 = math.floor(np.mean(widths2))"""
         widths1=remove_outliers(widths1, average_widths1)
         widths2=remove_outliers(widths2, average_widths2)
         
@@ -123,25 +119,20 @@ for road_path in  road_paths:
 
             # Flag in the normal direction
             for n in range(width1): 
-                x2 = int(j + n )
-                y2 = int(i + n )
+                x2 = int(j + n* norm_x )
+                y2 = int(i + n* norm_y )
 
                 if x2 >= 0 and x2 < edges.shape[1] and y2 >= 0 and y2 < edges.shape[0]:
-                    cv2.line(show_pb, (j, i), (x2, y2), (0, 0, 255), 2)
                     segmentation_mask[y2, x2] = 1
                 
             # Flag in the opposite direction
             for n in range(width2):
-                x3 = int(j - n )
-                y3 = int(i - n )
+                x3 = int(j - n* norm_x )
+                y3 = int(i - n* norm_y )
 
                 if x3 >= 0 and x3 < edges.shape[1] and y3 >= 0 and y3 < edges.shape[0]:
-                    cv2.line(show_pb, (j, i), (x3, y3), (0, 255, 0), 2)
                     segmentation_mask[y3, x3] = 1
-            
-            
-        #cv2.imshow("road", show_pb)    
-        #cv2.waitKey(0)
+
 
         
 

@@ -67,8 +67,11 @@ def extract_normals(central_axis):
     points = utils.sort_points(points)
 
     # Sobel filter to compute the gradient
-    sobel_x = cv2.Sobel(skeleton, cv2.CV_64F, 1, 0, ksize=5)
-    sobel_y = cv2.Sobel(skeleton, cv2.CV_64F, 0, 1, ksize=5)
+    sobel_x = cv2.Sobel(central_axis, cv2.CV_64F, 1, 0, ksize=5)
+    sobel_y = cv2.Sobel(central_axis, cv2.CV_64F, 0, 1, ksize=5)
+    sobel_x = cv2.dilate(sobel_x, np.ones((3, 3)))
+    sobel_y = cv2.dilate(sobel_y, np.ones((3, 3)))
+
 
     # Compute normals
     normals = []

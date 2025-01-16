@@ -85,6 +85,15 @@ print(true_mask_paths)
 pred_masks = [(cv2.imread(path, cv2.IMREAD_GRAYSCALE)).astype(np.uint8) for path in pred_mask_paths]
 true_masks = [(cv2.imread(path, cv2.IMREAD_GRAYSCALE)).astype(np.uint8) for path in true_mask_paths]
 
+
+# Trouver la taille maximale
+max_height = max([img.shape[0] for img in pred_masks + true_masks])
+max_width = max([img.shape[1] for img in pred_masks + true_masks])
+
+# Redimensionner les images
+pred_masks = [cv2.resize(img, (max_width, max_height), interpolation=cv2.INTER_NEAREST) for img in pred_masks]
+true_masks = [cv2.resize(img, (max_width, max_height), interpolation=cv2.INTER_NEAREST) for img in true_masks]
+
 results = evaluate_masks(pred_masks, true_masks,255)
 print("Evaluation Results:")
 print(f"Average Precision: {results['average_precision']:.4f}")

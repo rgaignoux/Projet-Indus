@@ -19,7 +19,7 @@ Ce score reflète les défis liés à l'entraînement sur un petit jeu de donné
 
 
 
-## 🏁 Résultats obtenus après fine tuning
+## 🏁 Résultats obtenus après fine-tuning
 
 Voici quelques résultats obtenus  :
 

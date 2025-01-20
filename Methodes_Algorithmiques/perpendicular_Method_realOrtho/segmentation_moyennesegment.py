@@ -57,8 +57,8 @@ for (central_axis_path, road_path) in zip(axes_paths, road_paths):
     lower_white = np.array([0, 0, 160])
     upper_white = np.array([180, 60, 255])
 
-    lower_green = np.array([35, 40, 40])
-    upper_green = np.array([85, 255, 255])
+    lower_green = np.array([15, 40, 40])
+    upper_green = np.array([105, 255, 255])
 
     mask1 = cv2.inRange(hsv_image, lower_white, upper_white)
     mask2 = cv2.inRange(hsv_image, lower_green, upper_green)

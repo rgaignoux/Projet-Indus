@@ -10,9 +10,11 @@ python .\Methodes_Algorithmiques/perpendicular_Method_realOrtho\segmentation_moy
 
 ## Métriques
 
-- Average **Precision**: `0.9218`
-- Average **Recall**: `0.6780`
-- Average **F1 Score**: `0.7760`
+Sur 14 images :
+
+- Average **Precision**: `0.9240`
+- Average **Recall**: `0.6636`
+- Average **F1 Score**: `0.7670`
 
 ## Résultats moyenne
 

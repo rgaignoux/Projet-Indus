@@ -1,7 +1,8 @@
 import numpy as np
 import cv2
 import argparse
-
+import os
+import glob
 
 
 def calculate_precision_recall_f1(pred_mask, true_mask):
@@ -74,13 +75,17 @@ def evaluate_masks(pred_masks, true_masks):
 
 folder="Metrics/toComputeMetrics/"
 
-# Exemple d'utilisation
-import glob
-
-pred_mask_paths = glob.glob(folder + "mask/*.png")  # Tous les fichiers masques prévus
 true_mask_paths = glob.glob(folder + "truth/*.png")  # Tous les fichiers masques vérités terrain
-print(len(pred_mask_paths))
-print(len(true_mask_paths))
+pred_mask_paths = []
+for true_path in true_mask_paths:
+    filename = os.path.basename(true_path).replace("segm_", "segm_road_")
+    pred_path = os.path.join(folder, "mask", filename)
+    pred_mask_paths.append(pred_path)
+
+for k in range(len(true_mask_paths)):
+    print(true_mask_paths[k])
+    print(pred_mask_paths[k])
+    print()
 
 pred_masks = [(cv2.imread(path, cv2.IMREAD_GRAYSCALE) > 127).astype(np.uint8) for path in pred_mask_paths]
 true_masks = [(cv2.imread(path, cv2.IMREAD_GRAYSCALE) > 127).astype(np.uint8) for path in true_mask_paths]

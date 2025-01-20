@@ -31,19 +31,20 @@ def get_image_paths(img_number):
 # Fonction pour analyser les arguments en ligne de commande
 def parse_args():
     parser = argparse.ArgumentParser(description="Process and segment road images.")
-    parser.add_argument('-img', type=int, default=0, choices=[0, 1], help="Select image: 0 for axe0, 1 for axe1")
+    parser.add_argument('-axe', type=str, default=0, help="Select image: 0 for axe0, 1 for axe1")
+    parser.add_argument('-road', type=str, default=0, help="Select image: 0 for axe0, 1 for axe1")
+
     parser.add_argument('-thresh', type=int, default=15, help="Threshold for region growing segmentation")
     return parser.parse_args()
 
 # Charger et prétraiter l'image
-def load_and_preprocess_images(axe_num):
+def load_and_preprocess_images(axe,road):
     # Get the dynamic paths based on the selected image number
-    road_path, central_axis_path = get_image_paths(axe_num)
     
     # Load the central axis image
-    central_axis = cv2.imread(central_axis_path, cv2.IMREAD_GRAYSCALE)
+    central_axis = cv2.imread(axe, cv2.IMREAD_GRAYSCALE)
     central_axis = resize_image(central_axis)
-    central_axis = cv2.bitwise_not(central_axis)  # Invert the image
+    #central_axis = cv2.bitwise_not(central_axis)  # Invert the image
 
     # Convert to binary and skeletonize
     binary_bool = central_axis > 0
@@ -51,7 +52,7 @@ def load_and_preprocess_images(axe_num):
     skeleton = np.uint8(skeleton) * 255
 
     # Load and preprocess road image
-    road = cv2.imread(road_path)
+    road = cv2.imread(road)
     road = cv2.resize(road, (central_axis.shape[1], central_axis.shape[0]), interpolation=cv2.INTER_NEAREST)
     road = preprocess_image2(road, filter_size=5)
     
@@ -63,12 +64,13 @@ if __name__ == "__main__":
     args = parse_args()
     
     # Load and preprocess the images based on the selected option
-    central_axis, road, skeleton = load_and_preprocess_images(args.img)
+    central_axis, road, skeleton = load_and_preprocess_images(args.axe, args.road)
     
     # Dilation of the skeleton
     kernel = np.ones((35, 35), np.uint8)
     dilated_mask = cv2.dilate(skeleton, kernel, iterations=1)
-
+    cv2.imshow("Dilated Mask", dilated_mask)
+    cv2.waitKey(0)
     # Apply the dilated mask to the road image
     masked_road = cv2.bitwise_and(road, road, mask=dilated_mask)
 

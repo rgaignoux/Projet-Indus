@@ -53,7 +53,8 @@ for road_path in  road_paths:
 
     # Canny edge detection
     edges = cv2.Canny(road_blurred, 100, 125)
-
+    cv2.imshow("edges", edges)
+    cv2.waitKey(0)
 
 
     # Create the segmentation mask

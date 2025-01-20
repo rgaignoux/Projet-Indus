@@ -46,7 +46,7 @@ if __name__ == "__main__":
     c = 0
     for (i, j), (norm_x, norm_y) in normals.items():
         c += 1
-        if c == 5:
+        if c == 3:
             if norm_x != 0 or norm_y != 0:
                 x1 = j
                 y1 = i
@@ -61,6 +61,6 @@ if __name__ == "__main__":
 
             c = 0
 
-    utils.display_image("Normals", skeleton_rgb)
+    utils.display_image("Normals", skeleton_rgb, scale=True)
     filename = os.path.splitext(os.path.basename(central_axis_path))[0]
-    cv2.imwrite(f".\\Methodes_Algorithmiques\\perpendicular_Method_realOrtho\\temp_normals_{filename}.png", skeleton_rgb)
+    cv2.imwrite(f".\\Methodes_Algorithmiques\\perpendicular_Method_realOrtho\\results\\normals_{filename}.png", skeleton_rgb)

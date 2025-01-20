@@ -4,10 +4,12 @@ from skimage import morphology
 import math
 import os
 
-def display_image(window_name, img):
+def display_image(window_name, img, scale = False):
     """
     Display an image in a window with the given name.
     """
+    if scale:
+        img = resize_image(img)
     cv2.imshow(window_name, img)
     cv2.waitKey(0)  # Wait until a key is pressed
     cv2.destroyAllWindows()
@@ -24,6 +26,7 @@ def resize_image(img, scale_percent = 65):
     img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
     
     return img
+
 def resize_image_v2(img, width, height):
     """
     Resize the image to the given width and height.
@@ -151,19 +154,46 @@ def get_min_max(file):
     return pic_min_x, pic_min_y, pic_max_x, pic_max_y
 
 def line_in_image(line, pic_min_x, pic_min_y, pic_max_x, pic_max_y):
+    # Cas 1 : La ligne est complètement hors de l'image
     if ((line[0][0] < pic_min_x and line[1][0] < pic_min_x) or
         (line[0][0] > pic_max_x and line[1][0] > pic_max_x) or
         (line[0][1] < pic_min_y and line[1][1] < pic_min_y) or
         (line[0][1] > pic_max_y and line[1][1] > pic_max_y)):
+        # Les deux points sont entièrement hors des limites de l'image
         return False
 
-    for point in line:
-        if (pic_min_x < point[0] < pic_max_x and pic_min_y < point[1] < pic_max_y):
+    # Cas 2 : Au moins un point de la ligne est dans l'image
+    if ((pic_min_x <= line[0][0] <= pic_max_x and pic_min_y <= line[0][1] <= pic_max_y) or
+        (pic_min_x <= line[1][0] <= pic_max_x and pic_min_y <= line[1][1] <= pic_max_y)):
+        # Au moins un des deux points est dans les limites de l'image
+        return True
+
+    # Cas 3 : La ligne traverse l'image sans qu'aucun point ne soit dedans
+    # Définition des 4 segments (bords) de l'image
+    borders = [
+        [(pic_min_x, pic_min_y), (pic_min_x, pic_max_y)],  # Bord gauche
+        [(pic_min_x, pic_max_y), (pic_max_x, pic_max_y)],  # Bord supérieur
+        [(pic_max_x, pic_max_y), (pic_max_x, pic_min_y)],  # Bord droit
+        [(pic_max_x, pic_min_y), (pic_min_x, pic_min_y)],  # Bord inférieur
+    ]
+    
+    # Fonction interne pour vérifier si deux segments s'intersectent
+    def segments_intersect(seg1, seg2):
+        def ccw(A, B, C):
+            # Calcule l'orientation relative des points A, B, C
+            return (C[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (C[0] - A[0])
+
+        A, B = seg1
+        C, D = seg2
+        # Deux segments s'intersectent si leurs extrémités sont dans des orientations opposées
+        return ccw(A, C, D) != ccw(B, C, D) and ccw(A, B, C) != ccw(A, B, D)
+
+    # Vérifie si la ligne traverse un des bords de l'image
+    for border in borders:
+        if segments_intersect(line, border):
             return True
 
-    # Cas 3 : aucun point dans l'image mais la ligne traverse l'image
-    # TODO: Vous pouvez ajouter ici la logique pour gérer ce cas.
-
+    # Si aucun des cas n'est vérifié, la ligne est hors de l'image
     return False
 
 #retourne une liste de routes qui sont dans l'image
@@ -175,15 +205,19 @@ def load_filaires(json_file, pic_min_x, pic_min_y, pic_max_x, pic_max_y):
     routes_list = []
 
     for feature in filaires:
-        route_list = []
-        meter_coords = feature.get('coordinates', [])
-        lines_temp = [[[e for e in meter_coords[i]], [e for e in meter_coords[i+1]]] for i in range(len(meter_coords)-1)]
+        if (
+            feature.get("etat") == "Définitif" and
+            feature.get("mode") == "Automobile"
+        ):
+            route_list = []
+            meter_coords = feature.get('coordinates', [])
+            lines_temp = [[[e for e in meter_coords[i]], [e for e in meter_coords[i+1]]] for i in range(len(meter_coords)-1)]
 
-        for line in lines_temp:
-            if line_in_image(line, pic_min_x, pic_min_y, pic_max_x, pic_max_y):
-                route_list.append(line)
-        if(len(route_list) > 0):
-            routes_list.append(route_list)
+            for line in lines_temp:
+                if line_in_image(line, pic_min_x, pic_min_y, pic_max_x, pic_max_y):
+                    route_list.append(line)
+            if(len(route_list) > 0):
+                routes_list.append(route_list)
     
     return routes_list
 

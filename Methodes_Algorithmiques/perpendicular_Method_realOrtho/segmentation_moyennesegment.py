@@ -20,6 +20,7 @@ def remove_outliers_and_compute_mean(widths_around, threshold = 1.75):
     # Update the average width
     if widths_around:
         average = np.mean(widths_around)
+        #np.quantile(widths_around, 0.75)
 
     return int(average)
 
@@ -52,17 +53,17 @@ for (central_axis_path, road_path) in zip(axes_paths, road_paths):
 
     # Filter out the white pixels
     hsv_image = cv2.cvtColor(road, cv2.COLOR_BGR2HSV)
-    lower_white = np.array([0, 0, 140])
-    upper_white = np.array([180, 40, 255])
+    lower_white = np.array([0, 0, 160])
+    upper_white = np.array([180, 60, 255])
     mask = cv2.inRange(hsv_image, lower_white, upper_white)
     hsv_image[mask > 0] = [0, 0, 160]
     road2 = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
 
     # Gaussian filtering
-    road_blurred = cv2.GaussianBlur(road2, (5,5), 0)
+    road_blurred = cv2.bilateralFilter(road2, 9, 150, 150)
 
     # Canny edge detection
-    edges = cv2.Canny(road_blurred, 100, 125)
+    edges = cv2.Canny(road_blurred, 75, 100)
 
     # Create the segmentation mask
     segmentation_mask = np.zeros(road.shape[:2])
@@ -155,11 +156,12 @@ for (central_axis_path, road_path) in zip(axes_paths, road_paths):
     # Overlay the segmentation on the road image
     result = road.copy()
     result[central_axis >= 1] = np.array([0, 0, 0])
-    result[segmentation_mask >= 1] = (0.2 * np.array([0, 255, 255]) + 0.8 * result[segmentation_mask >= 1]).astype(np.uint8)
+    result[segmentation_mask >= 1] = (0.4 * np.array([0, 255, 255]) + 0.6 * result[segmentation_mask >= 1]).astype(np.uint8)
     
     edges_with_axis = np.dstack((edges, edges, edges))
     edges_with_axis[central_axis >= 1] = (255, 0, 0)
     stacked = np.hstack((edges_with_axis, result))
-    utils.display_image("Result", stacked)
     cv2.imwrite(f"Methodes_Algorithmiques/perpendicular_Method_realOrtho//results//result_stacked_{filename}.png", stacked)
-        
+    
+    utils.display_image("Result", stacked, scale = True)
+       

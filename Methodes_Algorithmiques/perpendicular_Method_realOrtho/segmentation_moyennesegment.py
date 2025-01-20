@@ -32,7 +32,7 @@ args = parser.parse_args()
 directory_path = args.dir
 minmax = range(1, 50) # Min and max distances to check for edges
 json_file = 'Methodes_Algorithmiques/perpendicular_Method_realOrtho/Data/filaires-projection.json'
-display = 1
+display = 0
 
 # Images paths
 road_paths = [os.path.basename(file) for file in glob.glob(f"{directory_path}//*.png")]
@@ -51,19 +51,26 @@ for (central_axis_path, road_path) in zip(axes_paths, road_paths):
     # Get min_x, min_y, max_x, max_y
     pic_min_x, pic_min_y, pic_max_x, pic_max_y = utils.get_min_max(central_axis_path)
 
-    # Filter out the white pixels
+    # Filter out the white and green pixels
     hsv_image = cv2.cvtColor(road, cv2.COLOR_BGR2HSV)
+
     lower_white = np.array([0, 0, 160])
     upper_white = np.array([180, 60, 255])
-    mask = cv2.inRange(hsv_image, lower_white, upper_white)
-    hsv_image[mask > 0] = [0, 0, 160]
+
+    lower_green = np.array([35, 40, 40])
+    upper_green = np.array([85, 255, 255])
+
+    mask1 = cv2.inRange(hsv_image, lower_white, upper_white)
+    mask2 = cv2.inRange(hsv_image, lower_green, upper_green)
+    hsv_image[mask1 > 0] = [0, 0, 160]
+    hsv_image[mask2 > 0] = [0, 0, 160]
     road2 = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
 
     # Gaussian filtering
     road_blurred = cv2.bilateralFilter(road2, 9, 150, 150)
 
     # Canny edge detection
-    edges = cv2.Canny(road_blurred, 75, 100)
+    edges = cv2.Canny(road_blurred, 75, 125)
 
     # Create the segmentation mask
     segmentation_mask = np.zeros(road.shape[:2])
@@ -163,5 +170,6 @@ for (central_axis_path, road_path) in zip(axes_paths, road_paths):
     stacked = np.hstack((edges_with_axis, result))
     cv2.imwrite(f"Methodes_Algorithmiques/perpendicular_Method_realOrtho//results//result_stacked_{filename}.png", stacked)
     
-    utils.display_image("Result", stacked, scale = True)
+    if display == 1:
+        utils.display_image("Result", stacked, scale = True)
        

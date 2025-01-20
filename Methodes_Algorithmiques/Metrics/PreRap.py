@@ -79,6 +79,8 @@ import glob
 
 pred_mask_paths = glob.glob(folder + "mask/*.png")  # Tous les fichiers masques prévus
 true_mask_paths = glob.glob(folder + "truth/*.png")  # Tous les fichiers masques vérités terrain
+print(len(pred_mask_paths))
+print(len(true_mask_paths))
 
 pred_masks = [(cv2.imread(path, cv2.IMREAD_GRAYSCALE) > 127).astype(np.uint8) for path in pred_mask_paths]
 true_masks = [(cv2.imread(path, cv2.IMREAD_GRAYSCALE) > 127).astype(np.uint8) for path in true_mask_paths]

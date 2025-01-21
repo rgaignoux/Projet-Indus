@@ -32,7 +32,7 @@ args = parser.parse_args()
 directory_path = args.dir
 minmax = range(1, 50) # Min and max distances to check for edges
 json_file = 'Methodes_Algorithmiques/perpendicular_Method_realOrtho/Data/filaires-projection.json'
-display = 0
+display = 1
 
 # Images paths
 road_paths = [os.path.basename(file) for file in glob.glob(f"{directory_path}//*.png")]
@@ -54,23 +54,26 @@ for (central_axis_path, road_path) in zip(axes_paths, road_paths):
     # Filter out the white and green pixels
     hsv_image = cv2.cvtColor(road, cv2.COLOR_BGR2HSV)
 
-    lower_white = np.array([0, 0, 160])
-    upper_white = np.array([180, 60, 255])
+    lower_white = np.array([0, 0, 220])
+    upper_white = np.array([180, 20, 255])
 
-    lower_green = np.array([15, 40, 40])
-    upper_green = np.array([105, 255, 255])
+    lower_green = np.array([35, 20, 20])
+    upper_green = np.array([85, 255, 255])
 
     mask1 = cv2.inRange(hsv_image, lower_white, upper_white)
+    mask1 = cv2.dilate(mask1, np.ones((3, 3)))
     mask2 = cv2.inRange(hsv_image, lower_green, upper_green)
-    hsv_image[mask1 > 0] = [0, 0, 160]
-    hsv_image[mask2 > 0] = [0, 0, 160]
-    road2 = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
+    mask2 = cv2.dilate(mask2, np.ones((3, 3)))
 
     # Gaussian filtering
-    road_blurred = cv2.bilateralFilter(road2, 9, 150, 150)
+    road_blurred = cv2.bilateralFilter(road, 9, 150, 150)
 
     # Canny edge detection
     edges = cv2.Canny(road_blurred, 75, 125)
+    edges[mask1 > 0] = 0
+    road[mask1 > 0] = (255, 255, 255)
+    edges[mask2 > 0] = 0
+    road[mask2 > 0] = (0, 255, 0)
 
     # Create the segmentation mask
     segmentation_mask = np.zeros(road.shape[:2])
@@ -162,7 +165,7 @@ for (central_axis_path, road_path) in zip(axes_paths, road_paths):
 
     # Overlay the segmentation on the road image
     result = road.copy()
-    result[central_axis >= 1] = np.array([0, 0, 0])
+    result[central_axis >= 1] = np.array([255, 0, 0])
     result[segmentation_mask >= 1] = (0.4 * np.array([0, 255, 255]) + 0.6 * result[segmentation_mask >= 1]).astype(np.uint8)
     
     edges_with_axis = np.dstack((edges, edges, edges))

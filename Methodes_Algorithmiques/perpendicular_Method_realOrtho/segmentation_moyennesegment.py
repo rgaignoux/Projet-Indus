@@ -54,11 +54,11 @@ for (central_axis_path, road_path) in zip(axes_paths, road_paths):
     # Filter out the white and green pixels
     hsv_image = cv2.cvtColor(road, cv2.COLOR_BGR2HSV)
 
-    lower_white = np.array([0, 0, 220])
+    lower_white = np.array([0, 0, 200])
     upper_white = np.array([180, 20, 255])
 
-    lower_green = np.array([35, 20, 20])
-    upper_green = np.array([85, 255, 255])
+    lower_green = np.array([15, 40, 40])
+    upper_green = np.array([105, 255, 90])
 
     mask1 = cv2.inRange(hsv_image, lower_white, upper_white)
     mask1 = cv2.dilate(mask1, np.ones((3, 3)))
@@ -69,7 +69,7 @@ for (central_axis_path, road_path) in zip(axes_paths, road_paths):
     road_blurred = cv2.bilateralFilter(road, 9, 150, 150)
 
     # Canny edge detection
-    edges = cv2.Canny(road_blurred, 75, 125)
+    edges = cv2.Canny(road_blurred, 75, 100)
     edges[mask1 > 0] = 0
     road[mask1 > 0] = (255, 255, 255)
     edges[mask2 > 0] = 0
@@ -166,7 +166,7 @@ for (central_axis_path, road_path) in zip(axes_paths, road_paths):
     # Overlay the segmentation on the road image
     result = road.copy()
     result[central_axis >= 1] = np.array([255, 0, 0])
-    result[segmentation_mask >= 1] = (0.4 * np.array([0, 255, 255]) + 0.6 * result[segmentation_mask >= 1]).astype(np.uint8)
+    result[segmentation_mask >= 1] = (0.6 * np.array([0, 0, 255]) + 0.4 * result[segmentation_mask >= 1]).astype(np.uint8)
     
     edges_with_axis = np.dstack((edges, edges, edges))
     edges_with_axis[central_axis >= 1] = (255, 0, 0)

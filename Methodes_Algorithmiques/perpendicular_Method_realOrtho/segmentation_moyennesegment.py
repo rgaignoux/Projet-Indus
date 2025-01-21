@@ -135,6 +135,10 @@ for (central_axis_path, road_path) in zip(axes_paths, road_paths):
                 # Compute the average widths
                 average_width1 = remove_outliers_and_compute_mean(widths1)
                 average_width2 = remove_outliers_and_compute_mean(widths2)
+
+                average_width = average_width1 + average_width2
+                average_width_meters = average_width / 5 # 1m => 5px
+                print(f"Average width of segment {vec} : {average_width_meters} meters")
         
                 # Draw the segmentation
                 for k in range(0, len(points)):

@@ -120,7 +120,7 @@ for (central_axis_path, road_path) in zip(axes_paths, road_paths):
                 average_width_meters = average_width / resolution 
                 print(f"Average width of segment {vec} : {average_width_meters} meters")
                 json_output["data"].append({
-                    "projected_line": projected_line,
+                    "line": line,
                     "width": average_width_meters
                 })
         

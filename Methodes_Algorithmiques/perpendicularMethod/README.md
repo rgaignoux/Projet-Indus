@@ -38,9 +38,9 @@ Fichier `draw_normals.py` : permet de visualiser les normales de chaque segment
 
 ### Métriques
 
-- Average **Precision** : `0.9155`
-- Average **Recall** : `0.7374`
-- Average **F1 Score** : `0.8144`
+- Average **Precision** : `89%`
+- Average **Recall** : `75%`
+- Average **F1 Score** : `81%`
 
 ### Image de normales
 

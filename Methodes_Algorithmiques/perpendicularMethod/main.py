@@ -65,7 +65,6 @@ for (central_axis_path, road_path) in zip(axes_paths, road_paths):
         for line in route:
 
             projected_line = utils.project_on_image(line, pic_min_x, pic_min_y, pic_max_x, pic_max_y, road.shape[1], road.shape[0]) #vraiment road.shape?
-            print(projected_line)
             for i in range(len(projected_line) - 1):
                 # Compute normal vector
                 vec = np.array(projected_line[i]) - np.array(projected_line[i + 1])
@@ -154,9 +153,11 @@ for (central_axis_path, road_path) in zip(axes_paths, road_paths):
 
     # Overlay the segmentation on the road image
     result = road.copy()
-    result[central_axis >= 1] = np.array([255, 0, 0])
-    result[segmentation_mask >= 1] = (0.6 * np.array([0, 0, 255]) + 0.4 * result[segmentation_mask >= 1]).astype(np.uint8)
-    
+    central_axis_dilate = cv2.dilate(central_axis, np.ones((3, 3)))
+    result[central_axis_dilate >= 1] = np.array([255, 0, 0])
+    result[segmentation_mask >= 1] = (0.5 * np.array([0, 0, 255]) + 0.5 * result[segmentation_mask >= 1]).astype(np.uint8)
+    cv2.imwrite(f"Methodes_Algorithmiques/perpendicularMethod//results//images//overlay_{filename}.png", result)
+
     edges_with_axis = np.dstack((edges, edges, edges))
     edges_with_axis[central_axis >= 1] = (255, 0, 0)
     stacked = np.hstack((edges_with_axis, result))

@@ -34,6 +34,7 @@ Test de plusieurs modèles de segmentation sémantique :
 - DeepLabv3 [2] : Largeurs plus uniformes, mais masque de sortie 64x64 insuffisant pour une segmentation précise.
 
 [1] Ronneberger, Olaf, et al. "U-Net: Convolutional networks for biomedical image segmentation." (2015)
+
 [2] Chen, Liang-Chieh, et al. “Rethinking atrous convolution for semantic image segmentation.” (2017)
 
 #### Avantage
@@ -54,8 +55,19 @@ Beaucoup de routes non segmentées.
 | Rappel      | 75%   |  ?   |    ?      |
 | F1 score    | 81%   |  ?   |    ?      |
 
-### Images
+### Image
 
+#### Méthode algorithmique
+
+![alt text](Methodes_Algorithmiques/perpendicularMethod/results/images/overlay_road_1352400_7222400_1352600_7222600.png)
+
+#### Unet
+
+???
+
+#### DeepLabV3
+
+???
 
 ## Conclusion
 

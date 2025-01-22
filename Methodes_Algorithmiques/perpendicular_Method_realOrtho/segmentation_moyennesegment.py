@@ -20,19 +20,25 @@ def remove_outliers_and_compute_mean(widths_around, threshold = 1.75):
     # Update the average width
     if widths_around:
         average = np.mean(widths_around)
-        #np.quantile(widths_around, 0.75)
 
     return int(average)
 
-'python .\Methodes_Algorithmiques/perpendicular_Method_realOrtho\segmentation_moyennesegment.py -dir=".\Methodes_Algorithmiques\images\ImagesRennes\"'
 # Arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('-dir', type=str) # Directory path containing the images 
 args = parser.parse_args()
 directory_path = args.dir
-minmax = range(1, 50) # Min and max distances to check for edges
+minmax = range(3, 50) # Min and max distances to check for edges
+resolution = 5 # 1m => 5px
+canny_threshold = (50, 75) # threshold and hysteresis
 json_file = 'Methodes_Algorithmiques/perpendicular_Method_realOrtho/Data/filaires-projection.json'
-display = 1
+display = 0 # display images during the process
+
+# JSON result
+result = {
+    "projected_line": [],
+    "width": []
+}
 
 # Images paths
 road_paths = [os.path.basename(file) for file in glob.glob(f"{directory_path}//*.png")]
@@ -54,26 +60,17 @@ for (central_axis_path, road_path) in zip(axes_paths, road_paths):
     # Filter out the white and green pixels
     hsv_image = cv2.cvtColor(road, cv2.COLOR_BGR2HSV)
 
-    lower_white = np.array([0, 0, 200])
-    upper_white = np.array([180, 20, 255])
-
-    lower_green = np.array([15, 40, 40])
-    upper_green = np.array([105, 255, 90])
-
+    lower_white = np.array([0, 0, 210])
+    upper_white = np.array([180, 15, 255])
     mask1 = cv2.inRange(hsv_image, lower_white, upper_white)
     mask1 = cv2.dilate(mask1, np.ones((3, 3)))
-    mask2 = cv2.inRange(hsv_image, lower_green, upper_green)
-    mask2 = cv2.dilate(mask2, np.ones((3, 3)))
 
     # Gaussian filtering
-    road_blurred = cv2.bilateralFilter(road, 9, 150, 150)
+    road_blurred = cv2.bilateralFilter(road, 9, 200, 200)
 
     # Canny edge detection
-    edges = cv2.Canny(road_blurred, 75, 100)
+    edges = cv2.Canny(road_blurred, canny_threshold[0], canny_threshold[1])
     edges[mask1 > 0] = 0
-    road[mask1 > 0] = (255, 255, 255)
-    edges[mask2 > 0] = 0
-    road[mask2 > 0] = (0, 255, 0)
 
     # Create the segmentation mask
     segmentation_mask = np.zeros(road.shape[:2])
@@ -105,8 +102,8 @@ for (central_axis_path, road_path) in zip(axes_paths, road_paths):
                 for k in range(0, len(points)):
                     (i, j) = points[k]
 
-                    width1 = 0
-                    width2 = 0
+                    width1 = minmax[0]
+                    width2 = minmax[0]
                     
                     # Check the edges in the normal direction
                     for n in minmax:
@@ -136,9 +133,12 @@ for (central_axis_path, road_path) in zip(axes_paths, road_paths):
                 average_width1 = remove_outliers_and_compute_mean(widths1)
                 average_width2 = remove_outliers_and_compute_mean(widths2)
 
+                # Convert average width in meters
                 average_width = average_width1 + average_width2
-                average_width_meters = average_width / 5 # 1m => 5px
+                average_width_meters = average_width / resolution 
                 print(f"Average width of segment {vec} : {average_width_meters} meters")
+                data["projected_line"].append(projected_line)
+                data["width"].append(average_width_meters)
         
                 # Draw the segmentation
                 for k in range(0, len(points)):
@@ -179,4 +179,7 @@ for (central_axis_path, road_path) in zip(axes_paths, road_paths):
     
     if display == 1:
         utils.display_image("Result", stacked, scale = True)
-       
+
+# Save JSON
+with open('result.json', 'w') as json_file:
+    json.dump(data, json_file, indent=2)

@@ -51,23 +51,32 @@ Beaucoup de routes non segmentées.
 
 |             | Algo  | Unet | DeepLabV3 |
 |-------------|-------|------|-----------|
-| Précision   | 89%   |  ?   |    ?      |
-| Rappel      | 75%   |  ?   |    ?      |
-| F1 score    | 81%   |  ?   |    ?      |
+| Précision   | 89%   |  83%   |    80%      |
+| Rappel      | 75%   |  41%   |    39%      |
+| F1 score    | 81%   |  54%   |    52%      |
 
 ### Image
 
 #### Méthode algorithmique
 
+![alt text](Methodes_Algorithmiques/perpendicularMethod/results/result.png)
+
+|                  | Largeur |
+|------------------|---------|
+| Route noire      | 7.0m     |
+| Route rouge      | 10.4m     |
+| Route bleue      | 10.0m     |
+| Route bleue      | 10.2m     |
+
 ![alt text](Methodes_Algorithmiques/perpendicularMethod/results/images/overlay_road_1352400_7222400_1352600_7222600.png)
 
 #### Unet
 
-???
+![alt text](Methodes_IA/results/unet.png)
 
 #### DeepLabV3
 
-???
+![alt text](Methodes_IA/results/deeplabv3.png)
 
 ## Conclusion
 

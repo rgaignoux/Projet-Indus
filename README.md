@@ -1,5 +1,7 @@
 # Projet Industriel
 
+![alt text](poster.png)
+
 ## Objectifs
 
 Faire un **état de l’art** des méthodes pouvant permettre d’**estimer la largeur des routes et trottoirs** à partir de **vues aériennes** dans la perspective :

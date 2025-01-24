@@ -118,7 +118,7 @@ for (central_axis_path, road_path, segm_path) in zip(axes_paths, road_paths, seg
     new_segmentation_mask = cv2.morphologyEx(new_segmentation_mask, cv2.MORPH_CLOSE, np.ones((3, 3)), iterations=1)
     new_segmentation_mask = (new_segmentation_mask * 255).astype(np.uint8)
     filename = os.path.splitext(os.path.basename(road_path))[0]
-    cv2.imwrite(f"PostProcess/results/new_masks/segm_{filename}.png", new_segmentation_mask)
+    cv2.imwrite(f"PostProcess/new_masks/segm_{filename}.png", new_segmentation_mask)
     
     # Overlay the segmentation on the road image
     result = road.copy()

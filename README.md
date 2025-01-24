@@ -53,9 +53,9 @@ Beaucoup de routes non segmentées.
 
 |             | Algo  | Unet | DeepLabV3 |
 |-------------|-------|------|-----------|
-| Précision   | 89%   |  95%   |    95%      |
-| Rappel      | 75%   |  46%   |    47%      |
-| F1 score    | 81%   |  60%   |    61%      |
+| Précision   | 89%   |  83%   |    92%      |
+| Rappel      | 75%   |  41%   |    71%      |
+| F1 score    | 81%   |  54%   |    80%      |
 
 ### Image
 
@@ -74,11 +74,11 @@ Beaucoup de routes non segmentées.
 
 #### Unet
 
-![alt text](Methodes_IA/results/UnetPostProcess/overlay_road_1352400_7222400_1352600_7222600.png)
+![alt text](Methodes_IA/results/unet.png)
 
 #### DeepLabV3
 
-![alt text](Methodes_IA/results/DeepLabV3PostProcess/overlay_road_1352400_7222400_1352600_7222600.png)
+![alt text](Methodes_IA/results/deeplabv3.png)
 
 ## Conclusion
 
@@ -94,7 +94,6 @@ Beaucoup de routes non segmentées.
 - Test des méthodes sur d’autres villes que Rennes.
 
 ## Arborescence des fichiers
-
 ```
 ├─ ExtractionOrthophotographies,
 │  ├─ Gdal,
@@ -108,10 +107,10 @@ Beaucoup de routes non segmentées.
 │  │     ├─ mask
 │  │     └─ truth
 │  │
-│  └─ perpendicularMethod
-│     ├─ Data
-│     └─ results
+│  ├─ perpendicularMethod,
+│  │  ├─ Data
+│  │  └─ results
 │
-└─ Methodes_IA
-   └─ Deeplabv3+_RoadSegmentation
+└─ Methodes_IA,
+   └─ Deeplabv3+_RoadSegmentation,
 ```

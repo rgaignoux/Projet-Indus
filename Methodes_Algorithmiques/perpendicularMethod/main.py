@@ -16,7 +16,7 @@ minmax = range(3, 50) # Min and max distances to check for edges
 resolution = 5 # 1m => 5px
 canny_threshold = (75, 100)
 json_file = 'Methodes_Algorithmiques/perpendicularMethod/Data/filaires-projection.json' # Fichiers contenant les segments de routes
-display = 0 # 1 : display images during the process ; 0 : don't display
+display = 1 # 1 : display images during the process ; 0 : don't display
 
 # JSON result
 json_output = {
@@ -24,7 +24,6 @@ json_output = {
 }
 
 # Images paths
-road_paths = [os.path.basename(file) for file in glob.glob(f"{directory_path}//*.png")]
 axes_paths = glob.glob(f"{directory_path}//axe*.png")
 road_paths = glob.glob(f"{directory_path}//road*.png")
 
@@ -146,7 +145,7 @@ for (central_axis_path, road_path) in zip(axes_paths, road_paths):
 
 
     # Post process segmentation
-    segmentation_mask = cv2.morphologyEx(segmentation_mask, cv2.MORPH_CLOSE, np.ones((3, 3)), iterations=3)
+    segmentation_mask = cv2.morphologyEx(segmentation_mask, cv2.MORPH_CLOSE, np.ones((3, 3)), iterations=1)
     segmentation_mask = (segmentation_mask * 255).astype(np.uint8)
     filename = os.path.splitext(os.path.basename(road_path))[0]
     cv2.imwrite(f"Methodes_Algorithmiques/perpendicularMethod//results//images//segm_{filename}.png", segmentation_mask)

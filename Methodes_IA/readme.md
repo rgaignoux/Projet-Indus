@@ -8,9 +8,10 @@ Le code permet de charger un modèle de segmentation, de l'appliquer à des imag
 
 ### Metriques :
 Nous avons obtenue: 
-- **Average Precision**: 0.6413
-- **Average Recall**: 0.7325
-- **Average F1 Score**: 0.6568
+- **Average Precision**: 82%
+- **Average Recall**: 71%
+- **Average F1 Score**: 80%
+après post-processing
 
 ### Fonctionnalités :
 
